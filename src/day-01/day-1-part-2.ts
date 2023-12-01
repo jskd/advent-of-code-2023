@@ -1,49 +1,47 @@
-import * as moo from "moo";
+
+const reverseStr = (str : string) => str.split("").reverse().join("");
+
+const literalDigitMap: Map<string, string> = new Map([
+    ["one", "1"], 
+    ["two", "2"],
+    ["three", "3"],
+    ["four", "4"],
+    ["five", "5"],
+    ["six", "6"],
+    ["seven","7"],
+    ["eight", "8"],
+    ["nine", "9"],
+]);
 
 export abstract class Day1Part2 {
 
-    static readonly literalNumberMap: Map<string, number> = new Map([
-        ['one', 1], 
-        ['two', 2],
-        ['three', 3],
-        ['four', 4],
-        ['five', 5],
-        ['six', 6],
-        ['seven',7],
-        ['eight',8],
-        ['nine',9],
-    ]);
-
-    // Doesn't work for five61oneightr
-    static solve(input: string): number {
-        let sum = 0;
-        let fistDigit = 0;
-        let lastDigit = 0;
-
-        let lexer = moo.compile({
-            literal:  [...Day1Part2.literalNumberMap.keys()],
-            digit: /[0-9]/, 
-            newline: { match: /[\r\n]+/, lineBreaks: true },
-            useless: /.+?/
+    static replaceFirstLiteralByDigit(input: string) {
+        const literalTokens = [...literalDigitMap.keys()].join('|');
+        const regex = new RegExp(`(${literalTokens})`);
+        return input.replace(regex, (match) => {
+            return literalDigitMap.get(match) ?? ""
         });
-        lexer.reset(input);
+    }
 
-        for(let { type, value } of lexer) {
-            if (type == 'literal') {
-                fistDigit ||= Day1Part2.literalNumberMap.get(value)!;
-                lastDigit = Day1Part2.literalNumberMap.get(value)!;
-            } else if(type == 'digit') {
-                fistDigit ||= Number(value);
-                lastDigit = Number(value);
-            } else if(type === 'newline') {
-                sum += fistDigit * 10 + lastDigit;
-                fistDigit = 0;
-                lastDigit = 0;
-            } 
+    static replaceLastLiteralByDigit(input: string) {
+        const literalTokens = reverseStr([...literalDigitMap.keys()].join('|'));
+        const regex = new RegExp(`(${literalTokens})`);
+        return reverseStr(input).replace(regex, (match) => {
+            return literalDigitMap.get(reverseStr(match)) ?? ""
+        });
+    }
+
+    static evaluateLine(line: string): number {
+        const fistDigit = [...Day1Part2.replaceFirstLiteralByDigit(line)].find(v => Number(v));
+        const lastDigit = [...Day1Part2.replaceLastLiteralByDigit(line)].reverse().find(v => Number(v));
+        if(fistDigit && lastDigit) {
+            return (+fistDigit) * 10 + (+lastDigit);
         }
-        // for the last line
-        sum += fistDigit * 10 + lastDigit;
+        return 0;
+    }
 
-        return sum;
+    static solve(input: string): number {
+        const lines = input.split(/[\r\n]+/);
+        return lines.reduce((acc, line) => acc + Day1Part2.evaluateLine(line), 0);
     }
 }

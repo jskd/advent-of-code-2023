@@ -2,7 +2,7 @@ import { Day1Part2 } from "./day-1-part-2"
 
 describe("Part 2", function() {
 
-    it("Replace first literal by digit", function() {
+    it("Get first digit value", function() {
         expect(Day1Part2.getFirstDigit("two1nine", "leftToRight")).toBe(2);
         expect(Day1Part2.getFirstDigit("eightwothree", "leftToRight")).toBe(8);
         expect(Day1Part2.getFirstDigit("abcone2threexyz", "leftToRight")).toBe(1);
@@ -13,7 +13,7 @@ describe("Part 2", function() {
         expect(Day1Part2.getFirstDigit("five61oneightr", "leftToRight")).toBe(5);
     });
 
-    it("Replace last literal by digit", function() {
+    it("Get last digit value", function() {
         expect(Day1Part2.getFirstDigit("two1nine", "rightToLeft")).toBe(9);
         expect(Day1Part2.getFirstDigit("eightwothree", "rightToLeft")).toBe(3);
         expect(Day1Part2.getFirstDigit("abcone2threexyz", "rightToLeft")).toBe(3);
@@ -34,6 +34,10 @@ describe("Part 2", function() {
         expect(Day1Part2.solve("7pqrstsixteen")).toBe(76);
     });
 
+    it("Evaluate hard line", function() {
+        expect(Day1Part2.solve("five61oneightr")).toBe(58);
+    });
+
     it("Solve full example", function() {
         const example = "two1nine\r\n\
         eightwothree\r\n\
@@ -43,10 +47,6 @@ describe("Part 2", function() {
         zoneight234\r\n\
         7pqrstsixteen";
         expect(Day1Part2.solve(example)).toBe(281);
-    });
-
-    it("Evaluate hard line", function() {
-        expect(Day1Part2.solve("five61oneightr")).toBe(58);
     });
 });
 

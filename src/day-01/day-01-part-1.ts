@@ -1,4 +1,4 @@
-export abstract class Day1Part1 {
+export abstract class Day01Part1 {
     static evaluateLine([...line]: string): number {
         const fistDigit = line.find(v => Number(v));
         const lastDigit = line.reverse().find(v => Number(v));
@@ -9,7 +9,8 @@ export abstract class Day1Part1 {
     }
 
     static solve(input: string): number {
-        const lines = input.split(/[\r\n]+/);
-        return lines.reduce((acc, line) => acc + Day1Part1.evaluateLine(line), 0);
+        return input.split(/[\r\n]+/).filter(Boolean).reduce(
+            (acc, line) => acc + Day01Part1.evaluateLine(line)
+        , 0);
     }
 }

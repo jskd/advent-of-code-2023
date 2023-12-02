@@ -1,6 +1,6 @@
 type Direction = "leftToRight" | "rightToLeft";
 
-export abstract class Day1Part2 {
+export abstract class Day01Part2 {
     static readonly literalDigitMap: Map<string, number> = new Map([
         ["one", 1], ["1", 1], ["two", 2], ["2", 2], ["three", 3], ["3", 3], 
         ["four", 4], ["4", 4], ["five", 5],["5", 5], ["six", 6], ["6", 6],
@@ -17,7 +17,7 @@ export abstract class Day1Part2 {
     }
 
     static solve(input: string): number {
-        return input.split(/[\r\n]+/).reduce((acc, line) => 
+        return input.split(/[\r\n]+/).filter(Boolean).reduce((acc, line) => 
             acc + this.getFirstDigit(line, "leftToRight")*10 + this.getFirstDigit(line, "rightToLeft")
         , 0);
     }

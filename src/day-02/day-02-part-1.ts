@@ -1,19 +1,20 @@
-export interface Bag {
+interface Bag {
     [color: string]: number;
 }
 
 export abstract class Day02Part1 {
+    static readonly capacity: Bag = { red: 12, green: 13, blue: 14 };
 
-    static isPlayable(line: string, capacity: Bag): boolean {
+    static isPlayable(line: string): boolean {
         const regex = /(\d+) (\w+)/g;
         const sets = [... line.matchAll(regex)];
-        return !sets.some(([_, count, color]) => +count > capacity[color]);
+        return !sets.some(([_, count, color]) => +count > this.capacity[color]);
     }
 
-    static solve(input: string, capacity: Bag): number {
-        return input.split(/[\r\n]+/).reduce((acc, line) => {
-            const [_, game, sets] = line.match(/^Game (\d+): (.+)$/) ?? ["", "", ""];
-            return acc + (this.isPlayable(sets, capacity) ? (+game) : 0);
+    static solve(input: string): number {
+        return input.split(/[\r\n]+/).filter(Boolean).reduce((acc, line) => {
+            const [_, game, sets] = line.match(/^Game (\d+): (.+)$/)!;
+            return acc + (this.isPlayable(sets) ? (+game) : 0);
         }, 0); 
     }
 }

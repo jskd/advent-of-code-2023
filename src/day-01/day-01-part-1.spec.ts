@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Day01Part1 } from "./day-01-part-1"
 
-describe("Part 1", function() {
+describe("Day 1 part 1", function() {
     it("Evaluate one line", function() {
         expect(Day01Part1.evaluateLine("1abc2")).toBe(12);
         expect(Day01Part1.evaluateLine("pqr3stu8vwx")).toBe(38);
@@ -17,7 +17,7 @@ describe("Part 1", function() {
         expect(Day01Part1.solve(example)).toBe(142);
     });
 
-    it("Solve part 1", function() {
+    it("Solve day 1 part 1", function() {
         const content = fs.readFileSync(`${__dirname}/day-01-input.txt`);
         expect(Day01Part1.solve(content.toString())).toBe(55488);
     })

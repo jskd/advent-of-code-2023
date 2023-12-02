@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Day01Part2 } from "./day-01-part-2"
 
-describe("Part 2", function() {
+describe("Day 1 part 2", function() {
     it("Get first digit value", function() {
         expect(Day01Part2.getFirstDigit("two1nine", "leftToRight")).toBe(2);
         expect(Day01Part2.getFirstDigit("eightwothree", "leftToRight")).toBe(8);
@@ -39,17 +39,17 @@ describe("Part 2", function() {
     });
 
     it("Solve full example", function() {
-        const example = "two1nine\r\n\
-        eightwothree\r\n\
-        abcone2threexyz\r\n\
-        xtwone3four\r\n\
-        4nineeightseven2\r\n\
-        zoneight234\r\n\
-        7pqrstsixteen";
+        const example = "two1nine\r\n"
+            + "eightwothree\r\n"
+            + "abcone2threexyz\r\n"
+            + "xtwone3four\r\n"
+            + "4nineeightseven2\r\n"
+            + "zoneight234\r\n"
+            + "7pqrstsixteen";
         expect(Day01Part2.solve(example)).toBe(281);
     });
 
-    it("Solve part 2", function() {
+    it("Solve day 1 part 2", function() {
         const content = fs.readFileSync(`${__dirname}/day-01-input.txt`);
         expect(Day01Part2.solve(content.toString())).toBe(55614);
     })

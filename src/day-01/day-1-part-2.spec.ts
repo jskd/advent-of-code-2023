@@ -3,25 +3,25 @@ import { Day1Part2 } from "./day-1-part-2"
 describe("Part 2", function() {
 
     it("Replace first literal by digit", function() {
-        expect(Day1Part2.replaceFirstLiteralByDigit("two1nine", "leftToRight")).toBe("21nine");
-        expect(Day1Part2.replaceFirstLiteralByDigit("eightwothree", "leftToRight")).toBe("8wothree");
-        expect(Day1Part2.replaceFirstLiteralByDigit("abcone2threexyz", "leftToRight")).toBe("abc12threexyz");
-        expect(Day1Part2.replaceFirstLiteralByDigit("xtwone3four", "leftToRight")).toBe("x2ne3four");
-        expect(Day1Part2.replaceFirstLiteralByDigit("4nineeightseven2", "leftToRight")).toBe("49eightseven2");
-        expect(Day1Part2.replaceFirstLiteralByDigit("zoneight234", "leftToRight")).toBe("z1ight234");
-        expect(Day1Part2.replaceFirstLiteralByDigit("7pqrstsixteen", "leftToRight")).toBe("7pqrst6teen");
-        expect(Day1Part2.replaceFirstLiteralByDigit("five61oneightr", "leftToRight")).toBe("561oneightr");
+        expect(Day1Part2.getFirstDigit("two1nine", "leftToRight")).toBe(2);
+        expect(Day1Part2.getFirstDigit("eightwothree", "leftToRight")).toBe(8);
+        expect(Day1Part2.getFirstDigit("abcone2threexyz", "leftToRight")).toBe(1);
+        expect(Day1Part2.getFirstDigit("xtwone3four", "leftToRight")).toBe(2);
+        expect(Day1Part2.getFirstDigit("4nineeightseven2", "leftToRight")).toBe(4);
+        expect(Day1Part2.getFirstDigit("zoneight234", "leftToRight")).toBe(1);
+        expect(Day1Part2.getFirstDigit("7pqrstsixteen", "leftToRight")).toBe(7);
+        expect(Day1Part2.getFirstDigit("five61oneightr", "leftToRight")).toBe(5);
     });
 
     it("Replace last literal by digit", function() {
-        expect(Day1Part2.replaceFirstLiteralByDigit("two1nine", "rightToLeft")).toBe("two19");
-        expect(Day1Part2.replaceFirstLiteralByDigit("eightwothree", "rightToLeft")).toBe("eightwo3");
-        expect(Day1Part2.replaceFirstLiteralByDigit("abcone2threexyz", "rightToLeft")).toBe("abcone23xyz");
-        expect(Day1Part2.replaceFirstLiteralByDigit("xtwone3four", "rightToLeft")).toBe("xtwone34");
-        expect(Day1Part2.replaceFirstLiteralByDigit("4nineeightseven2", "rightToLeft")).toBe("4nineeight72");
-        expect(Day1Part2.replaceFirstLiteralByDigit("zoneight234", "rightToLeft")).toBe("zon8234");
-        expect(Day1Part2.replaceFirstLiteralByDigit("7pqrstsixteen", "rightToLeft")).toBe("7pqrst6teen");
-        expect(Day1Part2.replaceFirstLiteralByDigit("five61oneightr", "rightToLeft")).toBe("five61on8r");
+        expect(Day1Part2.getFirstDigit("two1nine", "rightToLeft")).toBe(9);
+        expect(Day1Part2.getFirstDigit("eightwothree", "rightToLeft")).toBe(3);
+        expect(Day1Part2.getFirstDigit("abcone2threexyz", "rightToLeft")).toBe(3);
+        expect(Day1Part2.getFirstDigit("xtwone3four", "rightToLeft")).toBe(4);
+        expect(Day1Part2.getFirstDigit("4nineeightseven2", "rightToLeft")).toBe(2);
+        expect(Day1Part2.getFirstDigit("zoneight234", "rightToLeft")).toBe(4);
+        expect(Day1Part2.getFirstDigit("7pqrstsixteen", "rightToLeft")).toBe(6);
+        expect(Day1Part2.getFirstDigit("five61oneightr", "rightToLeft")).toBe(8);
     });
 
     it("Evaluate one line", function() {

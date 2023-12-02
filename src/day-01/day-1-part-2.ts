@@ -1,28 +1,31 @@
 export abstract class Day1Part2 {
-    static readonly literalDigitMap: Map<string, string> = new Map([
-        ["one", "1"], 
-        ["two", "2"],
-        ["three", "3"],
-        ["four", "4"],
-        ["five", "5"],
-        ["six", "6"],
-        ["seven","7"],
-        ["eight", "8"],
-        ["nine", "9"],
+    static readonly literalDigitMap: Map<string, number> = new Map([
+        ["one", 1], 
+        ["two", 2],
+        ["three", 3],
+        ["four", 4],
+        ["five", 5],
+        ["six", 6],
+        ["seven",7],
+        ["eight", 8],
+        ["nine", 9],
+        ["1", 1], 
+        ["2", 2],
+        ["3", 3],
+        ["4", 4],
+        ["5", 5],
+        ["6", 6],
+        ["7",7],
+        ["8", 8],
+        ["9", 9]
     ]);
     static readonly literalTokens = [...this.literalDigitMap.keys()].join('|');
 
-    static replaceFirstLiteralByDigit(input: string, direction: "leftToRight" | "rightToLeft"): string {
-        const lazy = new RegExp(`(.*?)(${this.literalTokens})`);
-        const greedy = new RegExp(`(.*)(${this.literalTokens})`);
+    static getFirstDigit(input: string, direction: "leftToRight" | "rightToLeft"): number {
+        const lazy = new RegExp(`(?:.*?)(${this.literalTokens})`);
+        const greedy = new RegExp(`(?:.*)(${this.literalTokens})`);
         const regex = direction === "leftToRight" ? lazy : greedy;
-        return input.replace(regex, (_, p1, p2) => p1 + (this.literalDigitMap.get(p2) ?? ""));
-    }
-    
-    static getFirstDigit(line: string, direction: "leftToRight" | "rightToLeft"): number {
-        line = this.replaceFirstLiteralByDigit(line, direction);
-        let arrayCh = direction === "leftToRight" ? [...line] : [...line].reverse();
-        return Number(arrayCh.find(v => Number(v)) ?? "0");
+        return this.literalDigitMap.get( input.match(regex)?.[1] ?? "" ) ?? 0;
     }
 
     static solve(input: string): number {

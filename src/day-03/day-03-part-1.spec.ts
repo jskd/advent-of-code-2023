@@ -14,7 +14,7 @@ describe("Day 3 part 1", function() {
         "...$.*....",
         ".664.598.."
     ];
-    const symboles = [
+    const symbols = [
         [],
         [ 3 ],
         [],
@@ -28,11 +28,11 @@ describe("Day 3 part 1", function() {
     ];
 
     it("Find symbols position", function() {
-        expect(Day03Part1.findSymbolPosition(example)).toStrictEqual(symboles);
+        expect(Day03Part1.findSymbolPos(example)).toStrictEqual(symbols);
     });
 
     it("Find numbers position", function() {
-        expect(Day03Part1.getNumberPosition(example)).toStrictEqual([
+        expect(Day03Part1.getNumberPos(example)).toStrictEqual([
             {"value": "467", "x": 0, "y": 0}, 
             {"value": "114", "x": 0, "y": 5}, 
             {"value": "35", "x": 2, "y": 2}, 
@@ -47,16 +47,16 @@ describe("Day 3 part 1", function() {
     })
 
     it("Find if number is adjacent", function() {
-        expect(Day03Part1.isAdjacent({"value": "467", "x": 0, "y": 0}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "114", "x": 0, "y": 5}, symboles)).toBe(false);
-        expect(Day03Part1.isAdjacent({"value": "35", "x": 2, "y": 2}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "633", "x": 2, "y": 6}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "617", "x": 4, "y": 0}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "58", "x": 5, "y": 7}, symboles)).toBe(false);
-        expect(Day03Part1.isAdjacent({"value": "592", "x": 6, "y": 2}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "755", "x": 7, "y": 6}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "664", "x": 9, "y": 1}, symboles)).toBe(true);
-        expect(Day03Part1.isAdjacent({"value": "598", "x": 9, "y": 5}, symboles)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "467", "x": 0, "y": 0}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "114", "x": 0, "y": 5}, symbols)).toBe(false);
+        expect(Day03Part1.isAdjacent({"value": "35", "x": 2, "y": 2}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "633", "x": 2, "y": 6}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "617", "x": 4, "y": 0}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "58", "x": 5, "y": 7}, symbols)).toBe(false);
+        expect(Day03Part1.isAdjacent({"value": "592", "x": 6, "y": 2}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "755", "x": 7, "y": 6}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "664", "x": 9, "y": 1}, symbols)).toBe(true);
+        expect(Day03Part1.isAdjacent({"value": "598", "x": 9, "y": 5}, symbols)).toBe(true);
     });
 
     it("Solve example", function() {

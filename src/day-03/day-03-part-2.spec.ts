@@ -26,7 +26,7 @@ describe("Day 3 part 2", function() {
         {"value": "664", "x": 9, "y": 1}, 
         {"value": "598", "x": 9, "y": 5}
     ];
-    
+
     const gear1 = new GearPos(1, 3);
     const gear2 = new GearPos(4, 3);
     const gear3 = new GearPos(8, 5);
@@ -68,17 +68,17 @@ describe("Day 3 part 2", function() {
         expect(gears).toStrictEqual(associatedGears);
     });
 
-    it("calculate gear ratio", function() {
+    it("Calculate gear ratio", function() {
         expect(associatedGear1.getRatio()).toBe(16345);
         expect(associatedGear2.getRatio()).toBe(0);
         expect(associatedGear3.getRatio()).toBe(451490);
     });
 
-    it("calculate sum of gear ratio", function() {
+    it("Calculate sum of gear ratio", function() {
         expect( Day03Part2.getSumGearRatio(associatedGears)).toBe(467835);
     });
 
-    it("solve example", function() {
+    it("Solve example", function() {
         expect(Day03Part2.solve(example.join("\r\n"))).toBe(467835);
     });
 

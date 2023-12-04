@@ -40,18 +40,16 @@ export class NumberPosition {
 
 export abstract class Day03Part2 {
 
-    static findGearPosition(input: string): GearPosition[] {
-        return input.split(/[\r\n]+/).filter(Boolean)
-            .flatMap((line, lineNumber) => 
-                [ ...line.matchAll(/\*/g) ].map(({index}) => new GearPosition(lineNumber, index!)
-            ));
+    static findGearPosition(lines: string[]): GearPosition[] {
+        return lines.flatMap((line, lineNumber) => 
+            [ ...line.matchAll(/\*/g) ].map(({index}) => new GearPosition(lineNumber, index!)
+        ));
     }
 
-    static findNumberPosition(input: string): NumberPosition[] {
-        return input.split(/[\r\n]+/).filter(Boolean)
-            .flatMap((line, lineNumber) => 
-                [ ...line.matchAll(/\d+/g) ].map((match) => new NumberPosition(lineNumber, match.index!, match[0]!)
-            ));
+    static findNumberPosition(lines: string[]): NumberPosition[] {
+        return lines.flatMap((line, lineNumber) => 
+            [ ...line.matchAll(/\d+/g) ].map((match) => new NumberPosition(lineNumber, match.index!, match[0]!)
+        ));
     }
 
     static associateGearAdjacent(numberPosition: NumberPosition, gears: GearPosition[]) {
@@ -64,8 +62,10 @@ export abstract class Day03Part2 {
     }
 
     static solve(input: string) {
-        let gears = this.findGearPosition(input);
-        let numbers = this.findNumberPosition(input);
+        const lines = input.split(/[\r\n]+/).filter(Boolean);
+        let gears = this.findGearPosition(lines);
+        let numbers = this.findNumberPosition(lines);
+        
         numbers.forEach(pos => this.associateGearAdjacent(pos, gears));
         return this.getSumGearRatio(gears);
     }

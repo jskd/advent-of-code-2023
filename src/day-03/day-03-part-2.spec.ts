@@ -36,7 +36,8 @@ describe("Day 3 part 2", function() {
     ]
 
     it("Find gear position", function() {
-        expect(Day03Part2.findGearPosition(example)).toStrictEqual(gears);
+        const lines = example.split(/[\r\n]+/).filter(Boolean);
+        expect(Day03Part2.findGearPosition(lines)).toStrictEqual(gears);
     });
 
     it("Associate number adjacent to gear", function() {

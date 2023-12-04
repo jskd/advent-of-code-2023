@@ -59,8 +59,8 @@ export abstract class Day03Part2 {
 
     static solve(input: string) {
         const lines = input.split(/[\r\n]+/).filter(Boolean);
-        let gears = this.findGearPosition(lines);
-        let numbers = this.findNumberPosition(lines);
+        const gears = this.findGearPosition(lines);
+        const numbers = this.findNumberPosition(lines);
 
         numbers.forEach(pos => this.associateGearAdjacent(pos, gears));
         return this.getSumGearRatio(gears);

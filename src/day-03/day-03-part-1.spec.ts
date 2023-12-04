@@ -2,22 +2,29 @@ import { Day03Part1 } from "./day-03-part-1"
 import fs from 'fs'
 
 describe("Day 3 part 1", function() {
-    const example = "467..114..\r\n" +
-            "...*......\r\n" +
-            "..35..633.\r\n" +
-            "......#...\r\n" +
-            "617*......\r\n" +
-            ".....+.58.\r\n" +
-            "..592.....\r\n" +
-            "......755.\r\n" +
-            "...$.*....\r\n" +
-            ".664.598.." ;
+    const example = [
+        "467..114..",
+        "...*......",
+        "..35..633.",
+        "......#...",
+        "617*......",
+        ".....+.58.",
+        "..592.....",
+        "......755.",
+        "...$.*....",
+        ".664.598.."
+    ];
     const symboles = [
-        { line: 1, pos: [ 3 ] },
-        { line: 3, pos: [ 6 ] },
-        { line: 4, pos: [ 3 ] },
-        { line: 5, pos: [ 5 ] },
-        { line: 8, pos: [ 3, 5 ] }
+        [],
+        [ 3 ],
+        [],
+        [ 6 ],
+        [ 3 ],
+        [ 5 ],
+        [],
+        [],
+        [ 3, 5 ],
+        []
     ];
 
     it("Find symbols position", function() {
@@ -53,7 +60,7 @@ describe("Day 3 part 1", function() {
     });
 
     it("Solve example", function() {
-        expect(Day03Part1.solve(example)).toBe(4361);
+        expect(Day03Part1.solve(example.join("\r\n"))).toBe(4361);
     });  
 
     it("Solve day 3 part 1", function() {

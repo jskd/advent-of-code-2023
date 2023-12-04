@@ -1,7 +1,4 @@
-interface SymbolePosition {
-    line: number;
-    pos: number[];
-}
+type SymbolePosition = Array<Array<number>>;
 
 interface NumberPosition {
     x: number;
@@ -11,37 +8,25 @@ interface NumberPosition {
 
 export abstract class Day03Part1 {
 
-    static findSymbolPosition(input: string): SymbolePosition[] {
-        return input.split(/[\r\n]+/).filter(Boolean)
-            .flatMap((line, index) => {
-                const matchs = [... line.matchAll(/[^\d\.]/g)]
-                return matchs.length ? { 
-                    line: index,
-                    pos: matchs.flatMap(({index}) => index ?? []) 
-                } : []
-            });
+    static findSymbolPosition(lines: string[]): SymbolePosition {
+        return lines.map((line) => [...line.matchAll(/[^\d\.]/g)]
+            .map(({index}) => +index!));
     }
 
-    static getNumberPosition(input: string): NumberPosition[] {
-        return input.split(/[\r\n]+/).filter(Boolean)
-            .flatMap((line, index) => {
-                const matchs = [... line.matchAll(/\d+/g)]
-                return matchs.flatMap((match) => match ? {
-                    x: index,
-                    y: match.index!,
-                    value: match[0]
-                } : []) 
-            });
+    static getNumberPosition(lines: string[]): NumberPosition[] {
+        return lines.flatMap((line, index) => [...line.matchAll(/\d+/g)]
+            .map((match) => ({ x: index, y: match.index!, value: match[0]! })));
     }
 
-    static isAdjacent({x,y,value}: NumberPosition, symboles: SymbolePosition[]): boolean {
-        return symboles.filter(({ line }) => x-1 <= line && line <= x+1)
-            .some(({ pos }) => pos.some(y2 => y-1 <= y2 && y2 <= y+value.length))
+    static isAdjacent({x, y, value}: NumberPosition, symboles: SymbolePosition): boolean {
+        const nearSymboles = symboles[x].concat(symboles[x-1] ?? [], symboles[x+1] ?? []);
+        return nearSymboles.some((pos) => y-1 <= pos && pos <= y+value.length);
     }
 
     static solve(input: string) {
-        const symboles = this.findSymbolPosition(input)
-        return this.getNumberPosition(input)
+        const lines = input.split(/[\r\n]+/).filter(Boolean);
+        const symboles = this.findSymbolPosition(lines)
+        return this.getNumberPosition(lines)
             .filter((number) => this.isAdjacent(number, symboles))
             .reduce((acc, {value}) => acc + +value, 0);
     }

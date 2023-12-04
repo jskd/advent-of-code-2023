@@ -1,21 +1,18 @@
-import { Day03Part2, GearPosition } from "./day-03-part-2"
+import { Day03Part2, GearPos } from "./day-03-part-2"
 import fs from 'fs'
 
 describe("Day 3 part 2", function() {
-    const example = "467..114..\r\n" +
-            "...*......\r\n" +
-            "..35..633.\r\n" +
-            "......#...\r\n" +
-            "617*......\r\n" +
-            ".....+.58.\r\n" +
-            "..592.....\r\n" +
-            "......755.\r\n" +
-            "...$.*....\r\n" +
-            ".664.598.." ;
-    const gears = [
-        new GearPosition(1, 3),
-        new GearPosition(4, 3),
-        new GearPosition(8, 5),
+    const example = [
+        "467..114..",
+        "...*......",
+        "..35..633.",
+        "......#...",
+        "617*......",
+        ".....+.58.",
+        "..592.....",
+        "......755.",
+        "...$.*....",
+        ".664.598.."
     ];
     const numbers = [
         {"value": "467", "x": 0, "y": 0}, 
@@ -29,39 +26,60 @@ describe("Day 3 part 2", function() {
         {"value": "664", "x": 9, "y": 1}, 
         {"value": "598", "x": 9, "y": 5}
     ];
-    const associatedGear = [
-        new GearPosition(1, 3, [numbers[0], numbers[2]]),
-        new GearPosition(4, 3, [numbers[4]]),
-        new GearPosition(8, 5, [numbers[7], numbers[9]]),
-    ]
+    
+    const gear1 = new GearPos(1, 3);
+    const gear2 = new GearPos(4, 3);
+    const gear3 = new GearPos(8, 5);
+    const gears = [
+        [],
+        [gear1],
+        [],
+        [],
+        [gear2],
+        [],
+        [],
+        [],
+        [gear3],
+        []
+    ];
+
+    const associatedGear1 = new GearPos(1, 3, [+numbers[0].value, +numbers[2].value]);
+    const associatedGear2 = new GearPos(4, 3, [+numbers[4].value]);
+    const associatedGear3 = new GearPos(8, 5, [+numbers[7].value, +numbers[9].value]);
+    const associatedGears = [
+        [],
+        [associatedGear1],
+        [],
+        [],
+        [associatedGear2],
+        [],
+        [],
+        [],
+        [associatedGear3],
+        [],
+    ];
 
     it("Find gear position", function() {
-        const lines = example.split(/[\r\n]+/).filter(Boolean);
-        expect(Day03Part2.findGearPosition(lines)).toStrictEqual(gears);
+        expect(Day03Part2.findGearPosition(example)).toStrictEqual(gears);
     });
 
     it("Associate number adjacent to gear", function() {
-        let tested_gears = [
-            new GearPosition(1, 3),
-            new GearPosition(4, 3),
-            new GearPosition(8, 5),
-        ];
-        numbers.forEach(pos => Day03Part2.associateGearAdjacent(pos, tested_gears));
-        expect(tested_gears).toStrictEqual(associatedGear);
+        numbers.forEach(pos => Day03Part2.associateGearAdjacent(pos, gears));
+        expect(gears).toStrictEqual(associatedGears);
     });
 
     it("calculate gear ratio", function() {
-        expect(associatedGear[0].getRatio()).toBe(16345);
-        expect(associatedGear[1].getRatio()).toBe(0);
-        expect(associatedGear[2].getRatio()).toBe(451490);
+        expect(associatedGear1.getRatio()).toBe(16345);
+        expect(associatedGear2.getRatio()).toBe(0);
+        expect(associatedGear3.getRatio()).toBe(451490);
     });
 
     it("calculate sum of gear ratio", function() {
-        expect( Day03Part2.getSumGearRatio(associatedGear)).toBe(467835);
+        expect( Day03Part2.getSumGearRatio(associatedGears)).toBe(467835);
     });
 
     it("solve example", function() {
-        expect(Day03Part2.solve(example)).toBe(467835);
+        expect(Day03Part2.solve(example.join("\r\n"))).toBe(467835);
     });
 
     it("Solve day 3 part 2", function() {

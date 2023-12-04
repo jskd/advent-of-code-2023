@@ -1,9 +1,9 @@
 export class Card {
     readonly matchingNumbers: number;
 
-    private _count = 1;
-    get count() {
-        return this._count;
+    private _quantity = 1;
+    get quantity() {
+        return this._quantity;
     }
 
     constructor(line: string) {
@@ -15,7 +15,7 @@ export class Card {
     }
 
     winCopy(quantity: number) {
-        this._count += quantity;
+        this._quantity += quantity;
     }
 }
 
@@ -24,15 +24,15 @@ class CardCollection {
 
     constructor(lines: string[]) {
         this.cards = lines.map(line => new Card(line));
-        this.cards.forEach(({count, matchingNumbers}, index) => {
+        this.cards.forEach(({quantity, matchingNumbers}, index) => {
             for(let i=1; i<=matchingNumbers; i++) {
-                this.cards[index + i].winCopy(count);
+                this.cards[index + i].winCopy(quantity);
             }
         });
     }
 
     totalCard() {
-        return this.cards.reduce((acc, {count}) => acc+count, 0);
+        return this.cards.reduce((acc, {quantity}) => acc+quantity, 0);
     }
 }
 

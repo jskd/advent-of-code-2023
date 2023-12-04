@@ -9,6 +9,6 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "npx ts-node ./src/day-03/index.ts"
+    "start": "npx ts-node ./src/day-04/index.ts"
   }
 }

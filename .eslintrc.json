@@ -4,7 +4,7 @@
         "node": true
     },
     "extends": [
-        "eslint:recommended",
+        "eslint:recommended", 
         "plugin:@typescript-eslint/recommended",
         "prettier"
     ],
@@ -17,5 +17,14 @@
         "@typescript-eslint"
     ],
     "rules": {
-    }
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            { 
+              "argsIgnorePattern": "^_",
+              "varsIgnorePattern": "^_",
+              "caughtErrorsIgnorePattern": "^_"
+            }
+        ]
+    },
+    "root": true
 }

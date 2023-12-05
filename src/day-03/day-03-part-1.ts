@@ -10,7 +10,7 @@ export interface NumberPos {
 
 export abstract class Day03Part1 {
     static findSymbolPos(lines: string[]): SymbolPos {
-        return lines.map((line) => [...line.matchAll(/[^\d\.]/g)]
+        return lines.map((line) => [...line.matchAll(/[^\d.]/g)]
             .map(({index}) => +index!));
     }
 
@@ -24,7 +24,7 @@ export abstract class Day03Part1 {
         return nearSymbols.some((pos) => y-1 <= pos && pos <= y+value.length);
     }
 
-    static solve(input: string) {
+    static solve(input: string): number {
         const lines = input.split(/[\r\n]+/).filter(Boolean);
         const symbols = this.findSymbolPos(lines)
         return this.getNumberPos(lines)

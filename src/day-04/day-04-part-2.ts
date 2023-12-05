@@ -7,7 +7,7 @@ export class Card {
     }
 
     constructor(line: string) {
-        const [_, winStr, handStr] = line.split(/[:\|]/);
+        const [_, winStr, handStr] = line.split(/[:|]/);
         const winArray = winStr.split(" ").filter(Boolean).map(number => +number);
         const handArray = handStr.split(" ").filter(Boolean).map(number => +number);
         const winSet = new Set<number>(handArray);

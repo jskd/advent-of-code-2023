@@ -4,7 +4,7 @@ interface Bag {
 
 export abstract class Day02Part2 {
     static getPowerOfSet(line: string): number {
-        let min: Bag = {};
+        const min: Bag = {};
         const regex = /(\d+) (\w+)/g;
         const sets = [ ...line.matchAll(regex) ];
         sets.map(([_, count, color]) => min[color] = min[color] > +count ? min[color] : +count);

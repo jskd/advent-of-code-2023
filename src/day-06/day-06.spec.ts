@@ -1,4 +1,4 @@
-import { Day06Part1, Day06Part2, Race } from "./day-06-part-1";
+import { Day06Part1, Day06Part2, Race } from "./day-06";
 import fs from "fs";
 
 describe("Day 6", function () {

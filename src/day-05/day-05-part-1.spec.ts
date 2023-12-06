@@ -1,10 +1,4 @@
-import {
-  Day05Part1,
-  MapEntry,
-  Mapping,
-  MappingList,
-  Range,
-} from "./day-05-part-1";
+import { Day05Part1, Mapping, MappingList, Range } from "./day-05-part-1";
 import fs from "fs";
 
 describe("Day 5 part 1", function () {
@@ -16,24 +10,9 @@ describe("Day 5 part 1", function () {
   const temperatureHumidityLines = ["0 69 1", "1 0 69"];
   const humidityLocationLines = ["60 56 37", "56 93 4"];
 
-  it("Parse map entry", function () {
-    let entry = new MapEntry("50 98 2");
-    expect(entry.src).toEqual(new Range(98, 100));
-    expect(entry.dst).toEqual(new Range(50, 52));
-    expect(entry.offset).toEqual(-48);
-
-    entry = new MapEntry("52 50 48");
-    expect(entry.src).toEqual(new Range(50, 98));
-    expect(entry.dst).toEqual(new Range(52, 100));
-    expect(entry.offset).toEqual(2);
-  });
-
   it("Parse full mapping", function () {
     expect(new Mapping(seedToSoilLines)).toEqual({
-      maps: [
-        { src: new Range(98, 100), dst: new Range(50, 52), offset: -48 },
-        { src: new Range(50, 98), dst: new Range(52, 100), offset: 2 },
-      ],
+      maps: [new Range(98, 100, -48), new Range(50, 98, 2)],
     });
   });
 

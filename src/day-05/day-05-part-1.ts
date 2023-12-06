@@ -1,10 +1,20 @@
+export class Range {
+  constructor(
+    public readonly start: number,
+    public readonly end: number
+  ) {}
+}
+
 export class MapEntry {
-  readonly src: number;
-  readonly dst: number;
-  readonly len: number;
+  readonly src: Range;
+  readonly dst: Range;
+  readonly offset: number;
 
   constructor(line: string) {
-    [this.dst, this.src, this.len] = line.split(/\s+/).map((v) => +v);
+    const [dst, src, len] = line.split(/\s+/).map((v) => +v);
+    this.src = new Range(src, src + len);
+    this.dst = new Range(dst, dst + len);
+    this.offset = dst - src;
   }
 }
 
@@ -17,9 +27,9 @@ export class Mapping {
 
   getDestination(source: number) {
     const match = this.maps.find(
-      ({ src, len }) => src <= source && source < src + len
+      ({ src }) => src.start <= source && source < src.end
     );
-    return match ? source + match.dst - match.src : source;
+    return match ? source + match.offset : source;
   }
 }
 

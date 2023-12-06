@@ -1,3 +1,5 @@
+type SearchMode = "min" | "max";
+
 export class Race {
   public readonly numberWay: number;
 
@@ -5,28 +7,27 @@ export class Race {
     public readonly time: number,
     public readonly distance: number
   ) {
-    this.numberWay = this.calculateNumberOfWay();
+    this.numberWay = this.searchHold("max") - this.searchHold("min") + 1;
   }
 
   travelDistance(holdTime: number): number {
     return (this.time - holdTime) * holdTime;
   }
 
-  calculateNumberOfWay(): number {
+  searchHold(mode: SearchMode): number {
+    let minHold = 0;
     let maxHold = this.time;
-    let minHold = 1;
-
-    while (this.travelDistance(maxHold) <= this.distance) {
-      maxHold--;
-      if (!maxHold) {
-        return 0;
+    while (minHold < maxHold) {
+      const hold = Math.floor((minHold + maxHold) / 2);
+      if (this.travelDistance(hold) <= this.distance) {
+        if (mode === "min") minHold = hold + 1;
+        else maxHold = hold;
+      } else {
+        if (mode === "min") maxHold = hold;
+        else minHold = hold + 1;
       }
     }
-    while (this.travelDistance(minHold) <= this.distance) {
-      minHold++;
-    }
-
-    return maxHold - minHold + 1;
+    return mode === "min" ? maxHold : maxHold - 1;
   }
 }
 

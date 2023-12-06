@@ -8,6 +8,18 @@ describe("Day 6 part 1", function () {
     expect(new Race(30, 200).numberWay).toBe(9);
   });
 
+  it("Evaluate min hold", function () {
+    expect(new Race(7, 9).searchHold("min")).toBe(2);
+    expect(new Race(15, 40).searchHold("min")).toBe(4);
+    expect(new Race(30, 200).searchHold("min")).toBe(11);
+  });
+
+  it("Evaluate max hold", function () {
+    expect(new Race(7, 9).searchHold("max")).toBe(5);
+    expect(new Race(15, 40).searchHold("max")).toBe(11);
+    expect(new Race(30, 200).searchHold("max")).toBe(19);
+  });
+
   it("Solve full example", function () {
     // prettier-ignore
     const example = "Time:      7  15   30 \r\n" + 

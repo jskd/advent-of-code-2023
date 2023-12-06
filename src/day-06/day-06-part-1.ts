@@ -1,13 +1,13 @@
 type SearchMode = "min" | "max";
 
 export class Race {
-  public readonly numberWay: number;
+  public readonly way: number;
 
   constructor(
     public readonly time: number,
     public readonly distance: number
   ) {
-    this.numberWay = this.searchHold("max") - this.searchHold("min") + 1;
+    this.way = this.searchHold("max") - this.searchHold("min") + 1;
   }
 
   travelDistance(holdTime: number): number {
@@ -40,7 +40,21 @@ export abstract class Day06Part1 {
         .filter(Boolean)
     );
 
-    const races = times.map((time, index) => new Race(time, distances[index]));
-    return races.reduce((acc, { numberWay }) => acc * numberWay, 1);
+    return times
+      .map((time, index) => new Race(time, distances[index]))
+      .reduce((acc, { way }) => acc * way, 1);
+  }
+}
+
+export abstract class Day06Part2 {
+  static solve(input: string): number {
+    const [time, distance] = input
+      .split(/[\r\n]+/)
+      .filter(Boolean)
+      .map((line) => {
+        const valueStr = line.split(/:/)[1];
+        return +valueStr.replace(/\s/g, "");
+      });
+    return new Race(time, distance).way;
   }
 }

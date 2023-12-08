@@ -16,14 +16,11 @@ export class Hand {
   readonly strength: number;
 
   constructor(
-    readonly cards: string,
+    readonly cards: number[],
     readonly bid: number,
     withJoker: boolean
   ) {
-    this.strength = Hand.getStrengthHand(
-      Hand.mapCardStrength(cards),
-      withJoker
-    );
+    this.strength = Hand.getStrengthHand(cards, withJoker);
   }
 
   static mapCardStrength(cards: string): number[] {
@@ -93,8 +90,8 @@ export class Day7 {
         .split(/[\r\n]+/)
         .filter(Boolean)
         .map((line) => {
-          const [hand, bid] = line.split(/\s+/);
-          return new Hand(hand, +bid, withJoker);
+          const [cards, bid] = line.split(/\s+/);
+          return new Hand(Hand.mapCardStrength(cards), +bid, withJoker);
         })
     );
     return hands.sortByStrength().getTotalBid();

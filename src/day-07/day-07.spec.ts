@@ -29,31 +29,19 @@ fdescribe("Day 7", function () {
 
   it("Map joker as wildcard", function () {
     const J = Card.J;
-    expect(Hand.mapJokerAsWildcard([J, 2, 2, 9, 9])).toStrictEqual([
-      2, 2, 2, 9, 9,
-    ]);
-    expect(Hand.mapJokerAsWildcard([J, 2, 9, 9, 9])).toStrictEqual([
-      9, 2, 9, 9, 9,
-    ]);
+    const hand1 = [2, 2, 9, J, 9];
+    const hand2 = [J, 7, 9, 9, 9];
+    expect(Hand.mapJokerAsWildcard(hand1)).toStrictEqual([2, 2, 9, 2, 9]);
+    expect(Hand.mapJokerAsWildcard(hand2)).toStrictEqual([9, 7, 9, 9, 9]);
   });
 
   it("Map joker as weakest", function () {
     const J = Card.J;
     const W = Card.W;
-    expect(Hand.mapJokerAsWeakest([J, 2, 2, J, 9])).toStrictEqual([
-      W,
-      2,
-      2,
-      W,
-      9,
-    ]);
-    expect(Hand.mapJokerAsWeakest([J, 2, 9, 9, 9])).toStrictEqual([
-      W,
-      2,
-      9,
-      9,
-      9,
-    ]);
+    const hand1 = [J, 2, 9, J, 9];
+    const hand2 = [J, 2, J, 9, 9];
+    expect(Hand.mapJokerAsWeakest(hand1)).toStrictEqual([W, 2, 9, W, 9]);
+    expect(Hand.mapJokerAsWeakest(hand2)).toStrictEqual([W, 2, W, 9, 9]);
   });
 
   it("Solve Day 7 part 1 example ", function () {

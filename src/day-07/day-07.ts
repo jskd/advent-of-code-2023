@@ -1,26 +1,27 @@
 export class Card {
   // prettier-ignore
   static readonly map: Record<string, number> = {
-    "2": 0x2, "3": 0x3, "4": 0x4, "5": 0x5, "6": 0x6, "7": 0x7, "8": 0x8, "9": 0x9, 
-    "T": 0xa, "J": 0xb, "Q": 0xc, "K": 0xd, "A": 0xe
+    "W": 0x1, "2": 0x2, "3": 0x3, "4": 0x4, "5": 0x5, "6": 0x6, "7": 0x7, 
+    "8": 0x8, "9": 0x9, "T": 0xa, "J": 0xb, "Q": 0xc, "K": 0xd, "A": 0xe
   };
 
   /** Joker */
   static readonly J = Card.map["J"];
 
   /** Weak joker */
-  static readonly W = 0x1;
+  static readonly W = Card.map["W"];
 }
 
 export class Hand {
   readonly strength: number;
 
   constructor(
-    readonly cards: number[],
+    readonly cards: string,
     readonly bid: number,
     withJoker: boolean
   ) {
-    this.strength = Hand.getStrengthHand(cards, withJoker);
+    const cardsStrenghts = Hand.mapCardStrength(cards);
+    this.strength = Hand.getStrengthHand(cardsStrenghts, withJoker);
   }
 
   static mapCardStrength(cards: string): number[] {
@@ -67,13 +68,16 @@ export class Hand {
   }
 }
 
-class Hands extends Array<Hand> {
+export class Hands extends Array<Hand> {
   sortByStrength(): Hands {
     return this.sort(({ strength: a }, { strength: b }) => a - b);
   }
 
   getTotalBid(): number {
-    return this.reduce((acc, { bid }, index) => acc + bid * (index + 1), 0);
+    return this.sortByStrength().reduce(
+      (acc, { bid }, index) => acc + bid * (index + 1),
+      0
+    );
   }
 }
 
@@ -85,9 +89,9 @@ export class Day7 {
         .filter(Boolean)
         .map((line) => {
           const [cards, bid] = line.split(/\s+/);
-          return new Hand(Hand.mapCardStrength(cards), +bid, withJoker);
+          return new Hand(cards, +bid, withJoker);
         })
     );
-    return hands.sortByStrength().getTotalBid();
+    return hands.getTotalBid();
   }
 }

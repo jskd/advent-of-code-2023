@@ -8,8 +8,8 @@ fdescribe("Day 7", function () {
     ["444J3", 0x31],
     ["J58JJ", 0x31],
     ["JKKJJ", 0x32],
-  ])("Get %s strengh match", (input, expected) =>
-    expect(Hand.getStrenghtMatch(Hand.mapCardStrength(input))).toBe(expected)
+  ])("Get %s strength match", (input, expected) =>
+    expect(Hand.getStrengthMatch(Hand.mapCardStrength(input))).toBe(expected)
   );
 
   test.each([
@@ -18,8 +18,8 @@ fdescribe("Day 7", function () {
     ["444J3", 0x444b3],
     ["J58JJ", 0xb58bb],
     ["JKKJJ", 0xbddbb],
-  ])("Get %s strengh order", (input, expected) =>
-    expect(Hand.getStrenghtOrder(Hand.mapCardStrength(input))).toBe(expected)
+  ])("Get %s strength order", (input, expected) =>
+    expect(Hand.getStrengthOrder(Hand.mapCardStrength(input))).toBe(expected)
   );
 
   test.each([
@@ -28,13 +28,13 @@ fdescribe("Day 7", function () {
     ["444J3", 0x31444b3],
     ["J58JJ", 0x31b58bb],
     ["JKKJJ", 0x32bddbb],
-  ])("Get %s strengh without joker", (input, expected) =>
+  ])("Get %s strength without joker", (input, expected) =>
     expect(Hand.getStrengthHand(Hand.mapCardStrength(input), false)).toBe(
       expected
     )
   );
 
-  it("Sort by strengh without joker", function () {
+  it("Sort by strength without joker", function () {
     const inputs = [
       new Hand("444J3", 365, false),
       new Hand("32T3K", 136, false),
@@ -94,13 +94,13 @@ fdescribe("Day 7", function () {
     ["444J3", 0x4144413],
     ["J58JJ", 0x4115811],
     ["JKKJJ", 0x501dd11],
-  ])("Get %s strengh with joker", (input, expected) =>
+  ])("Get %s strength with joker", (input, expected) =>
     expect(Hand.getStrengthHand(Hand.mapCardStrength(input), true)).toBe(
       expected
     )
   );
 
-  it("Sort by strengh with joker", function () {
+  it("Sort by strength with joker", function () {
     const inputs = [
       new Hand("444J3", 365, true),
       new Hand("32T3K", 136, true),

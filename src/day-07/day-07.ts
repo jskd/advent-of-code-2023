@@ -20,8 +20,8 @@ export class Hand {
     readonly bid: number,
     withJoker: boolean
   ) {
-    const cardsStrenghts = Hand.mapCardStrength(cards);
-    this.strength = Hand.getStrengthHand(cardsStrenghts, withJoker);
+    const cardsStrength = Hand.mapCardStrength(cards);
+    this.strength = Hand.getStrengthHand(cardsStrength, withJoker);
   }
 
   static mapCardStrength(cards: string): number[] {
@@ -46,22 +46,22 @@ export class Hand {
     return cards.map((card) => (card == Card.J ? Card.W : card));
   }
 
-  static getStrenghtMatch(cards: number[]): number {
+  static getStrengthMatch(cards: number[]): number {
     const matchs: Record<string, number> = {};
     cards.forEach((card) => (matchs[card] = (matchs[card] || 0) + 1));
     const [high, low] = Object.values(matchs).sort().reverse();
     return (high << 4) | low;
   }
 
-  static getStrenghtOrder(cards: number[]): number {
+  static getStrengthOrder(cards: number[]): number {
     return cards.reduce((acc, card) => (acc << 4) | card, 0);
   }
 
   static getStrengthHand(cards: number[], withJoker: boolean) {
-    const order = Hand.getStrenghtOrder(
+    const order = Hand.getStrengthOrder(
       withJoker ? Hand.mapJokerAsWeakest(cards) : cards
     );
-    const match = Hand.getStrenghtMatch(
+    const match = Hand.getStrengthMatch(
       withJoker ? Hand.mapJokerAsWildcard(cards) : cards
     );
     return (match << 20) | order;

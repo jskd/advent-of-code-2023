@@ -1,34 +1,27 @@
 export class Hand {
   readonly strength: number;
 
+  // prettier-ignore
+  static readonly cardValue: Record<string, number> = {
+    "2": 0x0, "3": 0x1, "4": 0x2, "5": 0x3, "6": 0x4, "7": 0x5, "8": 0x6, "9": 0x7, 
+    "T": 0x8, "J": 0x9, "Q": 0xa, "K": 0xb, "A": 0xc
+  };
+
   constructor(
     readonly cards: string,
     readonly bid: number
   ) {
-    const numberCardes = Hand.mapCardStrength(cards);
-
+    const strenghtCards = Hand.mapCardStrength(cards);
     this.strength =
-      Hand.getScoreMatching(numberCardes) * 371293 +
-      Hand.getScoreOrder(numberCardes);
+      (Hand.getStrenghtMatch(strenghtCards) << 20) |
+      Hand.getStrenghtOrder(strenghtCards);
   }
 
   static mapCardStrength(cards: string): number[] {
-    const cardValue: Record<string, number> = {
-      T: 8,
-      J: 9,
-      Q: 10,
-      K: 11,
-      A: 12,
-    };
-    return [...cards].map((cp) => {
-      if ("2" <= cp && cp <= "9") {
-        return cp.charCodeAt(0) - "2".charCodeAt(0);
-      }
-      return cardValue[cp];
-    });
+    return [...cards].map((cp) => Hand.cardValue[cp]);
   }
 
-  static getScoreMatching(cards: number[]) {
+  static getStrenghtMatch(cards: number[]) {
     const matchs: Record<string, number> = {};
     cards.forEach((card) => (matchs[card] = (matchs[card] || 0) + 1));
     const [high, low] = Object.values(matchs).sort().reverse();
@@ -41,33 +34,40 @@ export class Hand {
     else return 0;
   }
 
-  static getScoreOrder(cards: number[]) {
-    return (
-      cards[0] * 28561 +
-      cards[1] * 2197 +
-      cards[2] * 169 +
-      cards[3] * 13 +
-      cards[4]
-    );
+  static getStrenghtOrder(cards: number[]) {
+    return cards.reduce((acc, card) => (acc << 4) | card, 0);
+  }
+}
+
+class Hands extends Array<Hand> {
+  constructor(hands: Hand[]) {
+    super(...hands);
+  }
+
+  sortByStrength(): Hands {
+    return this.sort(({ strength: a }, { strength: b }) => {
+      if (a > b) return 1;
+      if (a < b) return -1;
+      return 0;
+    });
+  }
+
+  getTotalBid(): number {
+    return this.reduce((acc, { bid }, index) => acc + bid * (index + 1), 0);
   }
 }
 
 export class Day7 {
   static solve(input: string): number {
-    let hands = input
-      .split(/[\r\n]+/)
-      .filter(Boolean)
-      .map((line) => {
-        const [hand, bid] = line.split(/\s+/);
-        return new Hand(hand, +bid);
-      });
-
-    hands = hands.sort((a, b) => {
-      if (a.strength > b.strength) return 1;
-      if (a.strength < b.strength) return -1;
-      return 0;
-    });
-
-    return hands.reduce((acc, { bid }, index) => acc + bid * (index + 1), 0);
+    const hands = new Hands(
+      input
+        .split(/[\r\n]+/)
+        .filter(Boolean)
+        .map((line) => {
+          const [hand, bid] = line.split(/\s+/);
+          return new Hand(hand, +bid);
+        })
+    );
+    return hands.sortByStrength().getTotalBid();
   }
 }

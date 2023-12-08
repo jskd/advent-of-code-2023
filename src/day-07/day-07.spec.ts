@@ -3,13 +3,13 @@ import fs from "fs";
 
 fdescribe("Day 7", function () {
   it("Get strengh match", function () {
-    expect(Hand.getStrenghtMatch([1, 1, 1, 1, 1])).toBe(6);
-    expect(Hand.getStrenghtMatch([1, 1, 1, 1, 2])).toBe(5);
-    expect(Hand.getStrenghtMatch([1, 1, 1, 2, 2])).toBe(4);
-    expect(Hand.getStrenghtMatch([1, 1, 1, 2, 3])).toBe(3);
-    expect(Hand.getStrenghtMatch([1, 1, 2, 2, 3])).toBe(2);
-    expect(Hand.getStrenghtMatch([1, 1, 2, 3, 4])).toBe(1);
-    expect(Hand.getStrenghtMatch([1, 2, 3, 4, 5])).toBe(0);
+    expect(Hand.getStrenghtMatch([1, 1, 1, 1, 1])).toBe(0x50);
+    expect(Hand.getStrenghtMatch([1, 1, 1, 1, 2])).toBe(0x41);
+    expect(Hand.getStrenghtMatch([1, 1, 1, 2, 2])).toBe(0x32);
+    expect(Hand.getStrenghtMatch([1, 1, 1, 2, 3])).toBe(0x31);
+    expect(Hand.getStrenghtMatch([1, 1, 2, 2, 3])).toBe(0x22);
+    expect(Hand.getStrenghtMatch([1, 1, 2, 3, 4])).toBe(0x21);
+    expect(Hand.getStrenghtMatch([1, 2, 3, 4, 5])).toBe(0x11);
   });
 
   it("Get strengh order", function () {
@@ -18,13 +18,13 @@ fdescribe("Day 7", function () {
   });
 
   it("Get strengh hand", function () {
-    expect(Hand.getStrengthHand([1, 1, 1, 1, 1], false)).toBe(0x611111);
-    expect(Hand.getStrengthHand([1, 1, 1, 1, 2], false)).toBe(0x511112);
-    expect(Hand.getStrengthHand([1, 1, 1, 2, 2], false)).toBe(0x411122);
-    expect(Hand.getStrengthHand([1, 1, 1, 2, 3], false)).toBe(0x311123);
-    expect(Hand.getStrengthHand([1, 1, 2, 2, 3], false)).toBe(0x211223);
-    expect(Hand.getStrengthHand([1, 1, 2, 3, 4], false)).toBe(0x111234);
-    expect(Hand.getStrengthHand([1, 2, 3, 4, 5], false)).toBe(0x012345);
+    expect(Hand.getStrengthHand([1, 1, 1, 1, 1], false)).toBe(0x5011111);
+    expect(Hand.getStrengthHand([1, 1, 1, 1, 2], false)).toBe(0x4111112);
+    expect(Hand.getStrengthHand([1, 1, 1, 2, 2], false)).toBe(0x3211122);
+    expect(Hand.getStrengthHand([1, 1, 1, 2, 3], false)).toBe(0x3111123);
+    expect(Hand.getStrengthHand([1, 1, 2, 2, 3], false)).toBe(0x2211223);
+    expect(Hand.getStrengthHand([1, 1, 2, 3, 4], false)).toBe(0x2111234);
+    expect(Hand.getStrengthHand([1, 2, 3, 4, 5], false)).toBe(0x1112345);
   });
 
   it("Map joker as wildcard", function () {

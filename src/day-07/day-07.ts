@@ -49,13 +49,7 @@ export class Hand {
     const matchs: Record<string, number> = {};
     cards.forEach((card) => (matchs[card] = (matchs[card] || 0) + 1));
     const [high, low] = Object.values(matchs).sort().reverse();
-    if (high === 5) return 6; // Five of a kind
-    else if (high === 4) return 5; // Four of a kind
-    else if (high === 3 && low === 2) return 4; // Full house
-    else if (high === 3) return 3; // Three of a kind
-    else if (high === 2 && low === 2) return 2; // Two pair
-    else if (high === 2) return 1; // One pair
-    else return 0;
+    return (high << 4) | low;
   }
 
   static getStrenghtOrder(cards: number[]): number {

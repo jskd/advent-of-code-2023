@@ -1,4 +1,4 @@
-import { Day7, Hand } from "./day-07";
+import { Card, Day7, Hand } from "./day-07";
 import fs from "fs";
 
 fdescribe("Day 7", function () {
@@ -28,7 +28,7 @@ fdescribe("Day 7", function () {
   });
 
   it("Map joker as wildcard", function () {
-    const J = Hand.J;
+    const J = Card.J;
     expect(Hand.mapJokerAsWildcard([J, 2, 2, 9, 9])).toStrictEqual([
       2, 2, 2, 9, 9,
     ]);
@@ -38,12 +38,21 @@ fdescribe("Day 7", function () {
   });
 
   it("Map joker as weakest", function () {
-    const J = Hand.J;
+    const J = Card.J;
+    const W = Card.W;
     expect(Hand.mapJokerAsWeakest([J, 2, 2, J, 9])).toStrictEqual([
-      1, 2, 2, 1, 9,
+      W,
+      2,
+      2,
+      W,
+      9,
     ]);
     expect(Hand.mapJokerAsWeakest([J, 2, 9, 9, 9])).toStrictEqual([
-      1, 2, 9, 9, 9,
+      W,
+      2,
+      9,
+      9,
+      9,
     ]);
   });
 

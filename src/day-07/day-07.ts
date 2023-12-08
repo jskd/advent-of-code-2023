@@ -1,10 +1,18 @@
-export class Hand {
+export class Card {
   // prettier-ignore
-  static readonly cardValue: Record<string, number> = {
+  static readonly map: Record<string, number> = {
     "2": 0x2, "3": 0x3, "4": 0x4, "5": 0x5, "6": 0x6, "7": 0x7, "8": 0x8, "9": 0x9, 
-    "T": 0xa, "J": 0xb, "Q": 0xc, "K": 0xe, "A": 0xf
+    "T": 0xa, "J": 0xb, "Q": 0xc, "K": 0xd, "A": 0xe
   };
-  static readonly J = Hand.cardValue["J"];
+
+  /** Joker */
+  static readonly J = Card.map["J"];
+
+  /** Weak joker */
+  static readonly W = 0x1;
+}
+
+export class Hand {
   readonly strength: number;
 
   constructor(
@@ -19,13 +27,13 @@ export class Hand {
   }
 
   static mapCardStrength(cards: string): number[] {
-    return [...cards].map((cp) => Hand.cardValue[cp]);
+    return [...cards].map((cp) => Card.map[cp]);
   }
 
   static mapJokerAsWildcard(cards: number[]) {
     const matchs: Record<string, number> = {};
     cards
-      .filter((v) => v != Hand.J)
+      .filter((card) => card != Card.J)
       .forEach((card) => (matchs[card] = (matchs[card] || 0) + 1));
 
     const bestMatch = Object.entries(matchs)
@@ -33,11 +41,11 @@ export class Hand {
       .shift()?.[0];
     return !bestMatch
       ? cards
-      : cards.map((card) => (card == Hand.J ? +bestMatch : card));
+      : cards.map((card) => (card == Card.J ? +bestMatch : card));
   }
 
   static mapJokerAsWeakest(cards: number[]): number[] {
-    return cards.map((card) => (card == Hand.J ? 0x1 : card));
+    return cards.map((card) => (card == Card.J ? Card.W : card));
   }
 
   static getStrenghtMatch(cards: number[]): number {

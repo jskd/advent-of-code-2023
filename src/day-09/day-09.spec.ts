@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Day9Part1, History } from "./day-09";
+import { Day9Part1, Day9Part2, History } from "./day-09";
 
 describe("Day 9", function () {
   test.each([
@@ -81,5 +81,15 @@ describe("Day 9", function () {
   const puzzle = fs.readFileSync(`${__dirname}/day-09-input.txt`);
   it("Solve Day 9 part 1 puzzle", function () {
     expect(Day9Part1.solve(puzzle.toString())).toBe(1581679977);
+  });
+
+  it("Solve Day 9 part 2 exemple", function () {
+    expect(History.sumOfNextValues([[10, 13, 16, 21, 30, 45].reverse()])).toBe(
+      5
+    );
+  });
+
+  it("Solve Day 9 part 2 puzzle", function () {
+    expect(Day9Part2.solve(puzzle.toString())).toBe(889);
   });
 });

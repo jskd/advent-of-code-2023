@@ -39,3 +39,20 @@ export class Day9Part1 {
     return History.sumOfNextValues(histories);
   }
 }
+
+export class Day9Part2 {
+  static solve(input: string): number {
+    const histories = input
+      .split(/[\r\n]+/)
+      .filter(Boolean)
+      .map((line) =>
+        line
+          .split(" ")
+          .map((value) => +value)
+          .reverse()
+      )
+      .filter(Boolean);
+
+    return History.sumOfNextValues(histories);
+  }
+}

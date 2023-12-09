@@ -1,11 +1,8 @@
 class Pos {
-  x: number;
-  y: number;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+  constructor(
+    public x: number,
+    public y: number
+  ) {}
 }
 
 export class GearPos extends Pos {
@@ -26,10 +23,12 @@ export class GearPos extends Pos {
 }
 
 export class NumberPos extends Pos {
-  value: string;
-  constructor(x: number, y: number, value: string) {
+  constructor(
+    x: number,
+    y: number,
+    public value: string
+  ) {
     super(x, y);
-    this.value = value;
   }
 }
 
@@ -37,29 +36,29 @@ export abstract class Day03Part2 {
   static findGearPosition(lines: string[]): GearPos[][] {
     return lines.map((line, lineNumber) =>
       [...line.matchAll(/\*/g)].map(
-        ({ index }) => new GearPos(lineNumber, index!),
-      ),
+        ({ index }) => new GearPos(lineNumber, index!)
+      )
     );
   }
 
   static findNumberPosition(lines: string[]): NumberPos[] {
     return lines.flatMap((line, lineNumber) =>
       [...line.matchAll(/\d+/g)].map(
-        (match) => new NumberPos(lineNumber, match.index!, match[0]!),
-      ),
+        (match) => new NumberPos(lineNumber, match.index!, match[0]!)
+      )
     );
   }
 
   static associateGearAdjacent(numberPosition: NumberPos, gears: GearPos[][]) {
     const { x, y: yN, value } = numberPosition;
-    const nearGears = gears[x].concat(gears[x - 1] ?? [], gears[x + 1] ?? []);
-    nearGears
+    [gears[x], gears[x - 1] || [], gears[x + 1] || []]
+      .flat()
       .filter(({ y: yG }) => yN - 1 <= yG && yG <= yN + value.length)
       .forEach((gear) => gear.pushNumber(+value));
   }
 
   static getSumGearRatio(gears: GearPos[][]): number {
-    return gears.flat(1).reduce((acc, gear) => acc + gear.getRatio(), 0);
+    return gears.flat().reduce((acc, gear) => acc + gear.getRatio(), 0);
   }
 
   static solve(input: string) {

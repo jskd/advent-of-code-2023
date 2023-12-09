@@ -1,4 +1,4 @@
-import { Day03Part1 } from "./day-03-part-1";
+import { Day03Part1, NumberPos } from "./day-03-part-1";
 import fs from "fs";
 
 describe("Day 3 part 1", function () {
@@ -22,49 +22,49 @@ describe("Day 3 part 1", function () {
 
   it("Find numbers position", function () {
     expect(Day03Part1.getNumberPos(example)).toStrictEqual([
-      { value: "467", x: 0, y: 0 },
-      { value: "114", x: 0, y: 5 },
-      { value: "35", x: 2, y: 2 },
-      { value: "633", x: 2, y: 6 },
-      { value: "617", x: 4, y: 0 },
-      { value: "58", x: 5, y: 7 },
-      { value: "592", x: 6, y: 2 },
-      { value: "755", x: 7, y: 6 },
-      { value: "664", x: 9, y: 1 },
-      { value: "598", x: 9, y: 5 },
+      new NumberPos(0, 0, "467"),
+      new NumberPos(0, 5, "114"),
+      new NumberPos(2, 2, "35"),
+      new NumberPos(2, 6, "633"),
+      new NumberPos(4, 0, "617"),
+      new NumberPos(5, 7, "58"),
+      new NumberPos(6, 2, "592"),
+      new NumberPos(7, 6, "755"),
+      new NumberPos(9, 1, "664"),
+      new NumberPos(9, 5, "598"),
     ]);
   });
 
   it("Find if number is adjacent", function () {
     expect(Day03Part1.isAdjacent({ value: "467", x: 0, y: 0 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "114", x: 0, y: 5 }, symbols)).toBe(
-      false,
+      false
     );
     expect(Day03Part1.isAdjacent({ value: "35", x: 2, y: 2 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "633", x: 2, y: 6 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "617", x: 4, y: 0 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "58", x: 5, y: 7 }, symbols)).toBe(
-      false,
+      false
     );
     expect(Day03Part1.isAdjacent({ value: "592", x: 6, y: 2 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "755", x: 7, y: 6 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "664", x: 9, y: 1 }, symbols)).toBe(
-      true,
+      true
     );
     expect(Day03Part1.isAdjacent({ value: "598", x: 9, y: 5 }, symbols)).toBe(
-      true,
+      true
     );
   });
 

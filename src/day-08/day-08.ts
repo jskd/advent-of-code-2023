@@ -20,14 +20,14 @@ export class Graph {
     nodes.forEach((node) => this.nodes.set(node.value, node));
   }
 
-  getNumberStep(start: string, targets: string[]) {
+  getNumberStep(start: string, targetEndsWith: string) {
     let step = 0;
     let current = this.nodes.get(start);
     if (!current) {
       throw new Error("Start node not found");
     }
 
-    while (!targets.includes(current.value)) {
+    while (!current.value.endsWith(targetEndsWith)) {
       const instruction = this.sequence.charAt(step % this.sequence.length);
       current = this.nodes.get(
         instruction == "R" ? current.right : current.left
@@ -41,17 +41,11 @@ export class Graph {
   }
 }
 
-function gcd(a: number, b: number) {
-  let temp = b;
-  while (b !== 0) {
-    b = a % b;
-    a = temp;
-    temp = b;
-  }
-  return a;
+function gcd(a: number, b: number): number {
+  return a == 0 ? b : gcd(b % a, a);
 }
 
-function lcm(a: number, b: number) {
+function lcm(a: number, b: number): number {
   return (a * b) / gcd(a, b);
 }
 
@@ -61,7 +55,7 @@ export class Day8Part1 {
     const sequence = lines.shift()!;
     const nodes = lines.map((line) => new Node(line));
     const nodeSequence = new Graph(sequence, nodes);
-    return nodeSequence.getNumberStep("AAA", ["ZZZ"]);
+    return nodeSequence.getNumberStep("AAA", "ZZZ");
   }
 }
 
@@ -72,12 +66,9 @@ export class Day8Part2 {
     const nodes = lines.map((line) => new Node(line));
     const nodeSequence = new Graph(sequence, nodes);
 
-    const nodeValues = nodes.map(({ value }) => value);
-    const starts = nodeValues.filter((v) => v.endsWith("A"));
-    const targets = nodeValues.filter((v) => v.endsWith("Z"));
-
-    return starts
-      .map((start) => nodeSequence.getNumberStep(start, targets))
+    return nodes
+      .filter(({ value }) => value.endsWith("A"))
+      .map(({ value }) => nodeSequence.getNumberStep(value, "Z"))
       .reduce((acc, v) => lcm(acc, v), 1);
   }
 }

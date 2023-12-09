@@ -6,7 +6,7 @@ export class History {
   }
 
   static extrapolate(history: number[][]) {
-    history.at(-1)?.push(0);
+    history.at(-1)!.push(0);
     for (let i = history.length - 2; i >= 0; i--) {
       history[i].push(history[i].at(-1)! + history[i + 1].at(-1)!);
     }
@@ -32,27 +32,19 @@ export class Day9Part1 {
   static solve(input: string): number {
     const histories = input
       .split(/[\r\n]+/)
-      .filter(Boolean)
-      .map((line) => line.split(" ").map((value) => +value))
-      .filter(Boolean);
-
+      .map((line) => line.split(" ").map((value) => +value));
     return History.sumOfNextValues(histories);
   }
 }
 
 export class Day9Part2 {
   static solve(input: string): number {
-    const histories = input
-      .split(/[\r\n]+/)
-      .filter(Boolean)
-      .map((line) =>
-        line
-          .split(" ")
-          .map((value) => +value)
-          .reverse()
-      )
-      .filter(Boolean);
-
+    const histories = input.split(/[\r\n]+/).map((line) =>
+      line
+        .split(" ")
+        .map((value) => +value)
+        .reverse()
+    );
     return History.sumOfNextValues(histories);
   }
 }

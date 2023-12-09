@@ -34,14 +34,12 @@ describe("Day 9", function () {
         [3, 3, 3, 3, 3],
         [0, 0, 0, 0],
       ],
-
       [
         [0, 3, 6, 9, 12, 15, 18],
         [3, 3, 3, 3, 3, 3],
         [0, 0, 0, 0, 0],
       ],
     ],
-
     [
       [
         [1, 3, 6, 10, 15, 21],
@@ -75,7 +73,7 @@ describe("Day 9", function () {
         [1, 3, 6, 10, 15, 21],
         [10, 13, 16, 21, 30, 45],
       ])
-    ).toStrictEqual(114);
+    ).toBe(114);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-09-input.txt`);

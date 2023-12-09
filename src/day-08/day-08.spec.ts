@@ -1,7 +1,7 @@
 import { Day8Part1, Day8Part2, Node } from "./day-08";
 import fs from "fs";
 
-describe("Day 8 Part 1", function () {
+describe("Day 8", function () {
   it("Parse node", function () {
     const node = new Node("AAA = (BBB, CCC)");
     expect(node.left).toBe("BBB");

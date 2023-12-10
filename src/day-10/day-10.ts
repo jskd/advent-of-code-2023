@@ -7,25 +7,22 @@ class Node {
     readonly y: number,
     readonly value: string
   ) {}
-
-  static getNodeHash(x: number, y: number): number {
-    return (x << 16) | y;
-  }
 }
 
-class MapNode {
-  nodes = new Map<number, Node>();
-  startingNode?: Node;
+class Graph {
+  startingNode: Node;
 
-  addNode(node: Node) {
-    this.nodes.set(Node.getNodeHash(node.x, node.y), node);
-    if (node.value === "S") {
-      this.startingNode = node;
+  constructor(public nodes: Node[][]) {
+    const startingNode = this.nodes.flat().find((n) => n.value == "S");
+    if (!startingNode) {
+      throw Error("No starting");
     }
+    this.startingNode = startingNode;
+    this.markStepsFromStart();
   }
 
   getNode(x: number, y: number): Node | undefined {
-    return this.nodes.get(Node.getNodeHash(x, y));
+    return this.nodes.at(x)?.at(y);
   }
 
   markNeighbors(node: Node): void {
@@ -45,13 +42,10 @@ class MapNode {
     }
   }
 
-  markStepsFrom(node: Node) {
-    this.nodes.forEach((node) => {
-      this.markNeighbors(node);
-      node.steps = undefined;
-    });
-    const queue = new Array<Node>(node);
-    node.steps = 0;
+  markStepsFromStart() {
+    this.nodes.flat().forEach((node) => this.markNeighbors(node));
+    const queue = new Array<Node>(this.startingNode);
+    this.startingNode.steps = 0;
     for (let current = queue.shift(); current; current = queue.shift()) {
       for (const neighbor of current.neighbors) {
         if (neighbor.steps === undefined) {
@@ -63,26 +57,19 @@ class MapNode {
   }
 
   getFarthestNodeStep(): number {
-    if (!this.startingNode) {
-      throw Error("No starting");
-    }
-    this.markStepsFrom(this.startingNode);
-    return [...this.nodes].reduce(
-      (acc, [_, { steps }]) => Math.max(acc, steps ?? 0),
-      0
-    );
+    return this.nodes
+      .flat()
+      .reduce((acc, { steps }) => Math.max(acc, steps ?? 0), 0);
   }
 }
 
 export class Day10 {
   static solve(input: string): number {
-    const graph = new MapNode();
-    input.split(/[\r\n]+/).map((line, x) =>
-      line
-        .split("")
-        .map((value, y) => new Node(x, y, value))
-        .forEach((node) => graph.addNode(node))
-    );
-    return graph.getFarthestNodeStep();
+    const nodes = input
+      .split(/[\r\n]+/)
+      .map((line, x) =>
+        line.split("").map((value, y) => new Node(x, y, value))
+      );
+    return new Graph(nodes).getFarthestNodeStep();
   }
 }

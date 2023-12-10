@@ -1,4 +1,4 @@
-import { Day05Part1, Mapping, MappingList, Range } from "./day-05-part-1";
+import { Day05Part1, Mapping, MappingList, MapEntry } from "./day-05-part-1";
 import fs from "fs";
 
 describe("Day 5 part 1", function () {
@@ -11,35 +11,35 @@ describe("Day 5 part 1", function () {
   const humidityLocationLines = ["60 56 37", "56 93 4"];
 
   test.each`
-    src                      | dst                      | expected
-    ${new Range(10, 60, 10)} | ${new Range(65, 10, 5)}  | ${new Range(15, 10, 5)}
-    ${new Range(10, 60, 5)}  | ${new Range(60, 10, 10)} | ${new Range(10, 10, 5)}
-  `("Get merged intersection %#", ({ src, dst, expected }) =>
+    src                         | dst                         | expected
+    ${new MapEntry(10, 60, 10)} | ${new MapEntry(65, 10, 5)}  | ${new MapEntry(15, 10, 5)}
+    ${new MapEntry(10, 60, 5)}  | ${new MapEntry(60, 10, 10)} | ${new MapEntry(10, 10, 5)}
+    ${new MapEntry(10, 60, 5)}  | ${new MapEntry(0, 10, 5)}   | ${null}
+    ${new MapEntry(50, 20, 5)}  | ${new MapEntry(20, 50, 5)}  | ${new MapEntry(50, 50, 5)}
+  `("Get merged intersection $#", ({ src, dst, expected }) =>
     expect(Mapping.getMergedIntersection(src, dst)).toStrictEqual(expected)
   );
 
   test.each`
-    src                      | merge                    | expected
-    ${new Range(60, 20, 20)} | ${new Range(50, 10, 40)} | ${[]}
-    ${new Range(60, 20, 20)} | ${new Range(20, 0, 20)}  | ${[new Range(60, 20, 20)]}
-    ${new Range(60, 20, 20)} | ${new Range(60, 20, 10)} | ${[new Range(70, 30, 10)]}
-    ${new Range(60, 20, 20)} | ${new Range(70, 20, 10)} | ${[new Range(60, 20, 10)]}
-    ${new Range(60, 20, 20)} | ${new Range(65, 25, 10)} | ${[new Range(60, 20, 5), new Range(75, 35, 5)]}
-  `("Get removeSourceIntesection intersection $#", ({ src, merge, expected }) =>
-    expect(Mapping.removeIntesectionSource(src, merge)).toStrictEqual(expected)
+    src                         | merge                       | expected
+    ${new MapEntry(60, 20, 20)} | ${new MapEntry(50, 10, 40)} | ${[]}
+    ${new MapEntry(60, 20, 20)} | ${new MapEntry(20, 0, 20)}  | ${[new MapEntry(60, 20, 20)]}
+    ${new MapEntry(60, 20, 20)} | ${new MapEntry(60, 20, 10)} | ${[new MapEntry(70, 30, 10)]}
+    ${new MapEntry(60, 20, 20)} | ${new MapEntry(70, 20, 10)} | ${[new MapEntry(60, 20, 10)]}
+    ${new MapEntry(60, 20, 20)} | ${new MapEntry(65, 25, 10)} | ${[new MapEntry(60, 20, 5), new MapEntry(75, 35, 5)]}
+  `("Get remove intersection on source $#", ({ src, merge, expected }) =>
+    expect(Mapping.removeIntesection(src, merge, "src")).toStrictEqual(expected)
   );
 
   test.each`
-    dst                      | merge                    | expected
-    ${new Range(20, 60, 20)} | ${new Range(10, 50, 40)} | ${[]}
-    ${new Range(20, 60, 20)} | ${new Range(0, 20, 20)}  | ${[new Range(20, 60, 20)]}
-    ${new Range(20, 60, 20)} | ${new Range(20, 60, 10)} | ${[new Range(30, 70, 10)]}
-    ${new Range(20, 60, 20)} | ${new Range(20, 70, 10)} | ${[new Range(20, 60, 10)]}
-    ${new Range(20, 60, 20)} | ${new Range(25, 65, 10)} | ${[new Range(20, 60, 5), new Range(35, 75, 5)]}
-  `("Get removeDestinationIntesection $#", ({ dst, merge, expected }) =>
-    expect(Mapping.removeDestinationIntesection(dst, merge)).toStrictEqual(
-      expected
-    )
+    dst                         | merge                       | expected
+    ${new MapEntry(20, 60, 20)} | ${new MapEntry(10, 50, 40)} | ${[]}
+    ${new MapEntry(20, 60, 20)} | ${new MapEntry(0, 20, 20)}  | ${[new MapEntry(20, 60, 20)]}
+    ${new MapEntry(20, 60, 20)} | ${new MapEntry(20, 60, 10)} | ${[new MapEntry(30, 70, 10)]}
+    ${new MapEntry(20, 60, 20)} | ${new MapEntry(20, 70, 10)} | ${[new MapEntry(20, 60, 10)]}
+    ${new MapEntry(20, 60, 20)} | ${new MapEntry(25, 65, 10)} | ${[new MapEntry(20, 60, 5), new MapEntry(35, 75, 5)]}
+  `("Get remove intersection on destination $#", ({ dst, merge, expected }) =>
+    expect(Mapping.removeIntesection(dst, merge, "dst")).toStrictEqual(expected)
   );
 
   it("Get corresponding destination", function () {

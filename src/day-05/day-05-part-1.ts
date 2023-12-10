@@ -1,78 +1,80 @@
-export class Range {
-  public srcEnd: number;
-  public dstEnd: number;
+class Range {
+  constructor(
+    public start: number,
+    public end: number
+  ) {}
+}
+
+export class MapEntry {
+  public src: Range;
+  public dst: Range;
   public offset: number;
 
-  constructor(
-    public srcStart: number,
-    public dstStart: number,
-    public len: number
-  ) {
-    this.srcEnd = srcStart + len;
-    this.dstEnd = dstStart + len;
+  constructor(srcStart: number, dstStart: number, len: number) {
+    this.src = new Range(srcStart, srcStart + len);
+    this.dst = new Range(dstStart, dstStart + len);
     this.offset = dstStart - srcStart;
   }
 }
 
 export class Mapping {
-  maps: Range[];
+  maps: MapEntry[];
 
   constructor(lines: string[]) {
     this.maps = lines.map((line) => {
       const [dst, src, len] = line.split(/\s+/).map((v) => +v);
-      return new Range(src, dst, len);
+      return new MapEntry(src, dst, len);
     });
   }
 
   getDestination(source: number) {
     const match = this.maps.find(
-      ({ srcStart, srcEnd }) => srcStart <= source && source < srcEnd
+      ({ src }) => src.start <= source && source < src.end
     );
-    return match ? match.dstStart + (source - match.srcStart) : source;
+    return match ? match.dst.start + (source - match.src.start) : source;
   }
 
-  static getMergedIntersection(src: Range, dst: Range) {
-    if (src.dstEnd <= dst.srcStart || src.dstStart >= dst.srcEnd) {
+  static getMergedIntersection(src: MapEntry, dst: MapEntry) {
+    if (src.dst.end <= dst.src.start || src.dst.start >= dst.src.end) {
       return null;
     }
-    const start = Math.max(src.dstStart, dst.srcStart);
-    const len = Math.min(src.dstEnd, dst.srcEnd) - start;
-    return new Range(start - src.offset, start + dst.offset, len);
+    const start = Math.max(src.dst.start, dst.src.start);
+    const len = Math.min(src.dst.end, dst.src.end) - start;
+    return new MapEntry(start - src.offset, start + dst.offset, len);
   }
 
-  static removeIntesectionSource(src: Range, merge: Range) {
-    if (src.srcEnd <= merge.srcStart || src.srcStart >= merge.srcEnd) {
-      return [src];
-    }
-    const result: Range[] = [];
-    if (src.srcEnd > merge.srcStart && merge.srcStart > src.srcStart) {
-      result.push(
-        new Range(src.srcStart, src.dstStart, merge.srcStart - src.srcStart)
-      );
-    }
-    if (src.srcEnd > merge.srcEnd && src.srcEnd > merge.srcEnd) {
-      const overlap = src.srcEnd - merge.srcEnd;
-      result.push(
-        new Range(src.srcEnd - overlap, src.dstEnd - overlap, overlap)
-      );
-    }
-    return result;
-  }
+  static removeIntesection(
+    sourceEntry: MapEntry,
+    mergeEntry: MapEntry,
+    mode: "src" | "dst"
+  ) {
+    const [source, merge] =
+      mode == "src"
+        ? [sourceEntry.src, mergeEntry.src]
+        : [sourceEntry.dst, mergeEntry.dst];
 
-  static removeDestinationIntesection(dst: Range, merge: Range) {
-    if (dst.dstEnd <= merge.dstStart || dst.dstStart >= merge.dstEnd) {
-      return [dst];
+    if (source.end <= merge.start || source.start >= merge.end) {
+      return [sourceEntry];
     }
-    const result: Range[] = [];
-    if (dst.dstEnd > merge.dstStart && merge.dstStart > dst.dstStart) {
+
+    const result: MapEntry[] = [];
+    if (source.end > merge.start && merge.start > source.start) {
       result.push(
-        new Range(dst.srcStart, dst.dstStart, merge.dstStart - dst.dstStart)
+        new MapEntry(
+          sourceEntry.src.start,
+          sourceEntry.dst.start,
+          merge.start - source.start
+        )
       );
     }
-    if (dst.dstEnd > merge.dstEnd && dst.dstEnd > merge.dstEnd) {
-      const overlap = dst.dstEnd - merge.dstEnd;
+    if (source.end > merge.end && source.end > merge.end) {
+      const overlap = source.end - merge.end;
       result.push(
-        new Range(dst.srcEnd - overlap, dst.dstEnd - overlap, overlap)
+        new MapEntry(
+          sourceEntry.src.end - overlap,
+          sourceEntry.dst.end - overlap,
+          overlap
+        )
       );
     }
     return result;

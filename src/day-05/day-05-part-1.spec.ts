@@ -10,11 +10,37 @@ describe("Day 5 part 1", function () {
   const temperatureHumidityLines = ["0 69 1", "1 0 69"];
   const humidityLocationLines = ["60 56 37", "56 93 4"];
 
-  it("Parse full mapping", function () {
-    expect(new Mapping(seedToSoilLines)).toEqual({
-      maps: [new Range(98, 100, -48), new Range(50, 98, 2)],
-    });
-  });
+  test.each`
+    src                      | dst                      | expected
+    ${new Range(10, 60, 10)} | ${new Range(65, 10, 5)}  | ${new Range(15, 10, 5)}
+    ${new Range(10, 60, 5)}  | ${new Range(60, 10, 10)} | ${new Range(10, 10, 5)}
+  `("Get merged intersection %#", ({ src, dst, expected }) =>
+    expect(Mapping.getMergedIntersection(src, dst)).toStrictEqual(expected)
+  );
+
+  test.each`
+    src                      | merge                    | expected
+    ${new Range(60, 20, 20)} | ${new Range(50, 10, 40)} | ${[]}
+    ${new Range(60, 20, 20)} | ${new Range(20, 0, 20)}  | ${[new Range(60, 20, 20)]}
+    ${new Range(60, 20, 20)} | ${new Range(60, 20, 10)} | ${[new Range(70, 30, 10)]}
+    ${new Range(60, 20, 20)} | ${new Range(70, 20, 10)} | ${[new Range(60, 20, 10)]}
+    ${new Range(60, 20, 20)} | ${new Range(65, 25, 10)} | ${[new Range(60, 20, 5), new Range(75, 35, 5)]}
+  `("Get removeSourceIntesection intersection $#", ({ src, merge, expected }) =>
+    expect(Mapping.removeIntesectionSource(src, merge)).toStrictEqual(expected)
+  );
+
+  test.each`
+    dst                      | merge                    | expected
+    ${new Range(20, 60, 20)} | ${new Range(10, 50, 40)} | ${[]}
+    ${new Range(20, 60, 20)} | ${new Range(0, 20, 20)}  | ${[new Range(20, 60, 20)]}
+    ${new Range(20, 60, 20)} | ${new Range(20, 60, 10)} | ${[new Range(30, 70, 10)]}
+    ${new Range(20, 60, 20)} | ${new Range(20, 70, 10)} | ${[new Range(20, 60, 10)]}
+    ${new Range(20, 60, 20)} | ${new Range(25, 65, 10)} | ${[new Range(20, 60, 5), new Range(35, 75, 5)]}
+  `("Get removeDestinationIntesection $#", ({ dst, merge, expected }) =>
+    expect(Mapping.removeDestinationIntesection(dst, merge)).toStrictEqual(
+      expected
+    )
+  );
 
   it("Get corresponding destination", function () {
     const mapping = new Mapping(seedToSoilLines);

@@ -1,43 +1,16 @@
 export class Range {
+  public srcEnd: number;
+  public dstEnd: number;
+  public offset: number;
+
   constructor(
-    public start: number,
-    public end: number,
-    public offset: number
-  ) {}
-
-  getIntersection(range: Range): Range | null {
-    return this.end <= range.start || this.start >= range.end
-      ? null
-      : new Range(
-          Math.max(this.start, range.start),
-          Math.min(this.end, range.end),
-          this.offset
-        );
-  }
-
-  removeIntersection(range: Range): Range[] {
-    const result: Range[] = [];
-    if (this.start < range.start) {
-      result.push(new Range(this.start, range.start, this.offset));
-    }
-    if (this.end > range.end) {
-      result.push(new Range(range.end, this.end, this.offset));
-    }
-    return result;
-  }
-
-  removeMultipleIntersection(ranges: Range[]): Range[] {
-    let results = [new Range(this.start, this.end, this.offset)];
-    for (const range of ranges) {
-      results = results.flatMap((result) => result.removeIntersection(range));
-    }
-    return results;
-  }
-
-  reverse() {
-    this.start += this.offset;
-    this.end += this.offset;
-    this.offset *= -1;
+    public srcStart: number,
+    public dstStart: number,
+    public len: number
+  ) {
+    this.srcEnd = srcStart + len;
+    this.dstEnd = dstStart + len;
+    this.offset = dstStart - srcStart;
   }
 }
 
@@ -47,15 +20,62 @@ export class Mapping {
   constructor(lines: string[]) {
     this.maps = lines.map((line) => {
       const [dst, src, len] = line.split(/\s+/).map((v) => +v);
-      return new Range(src, src + len, dst - src);
+      return new Range(src, dst, len);
     });
   }
 
   getDestination(source: number) {
     const match = this.maps.find(
-      ({ start, end }) => start <= source && source < end
+      ({ srcStart, srcEnd }) => srcStart <= source && source < srcEnd
     );
-    return match ? source + match.offset : source;
+    return match ? match.dstStart + (source - match.srcStart) : source;
+  }
+
+  static getMergedIntersection(src: Range, dst: Range) {
+    if (src.dstEnd <= dst.srcStart || src.dstStart >= dst.srcEnd) {
+      return null;
+    }
+    const start = Math.max(src.dstStart, dst.srcStart);
+    const len = Math.min(src.dstEnd, dst.srcEnd) - start;
+    return new Range(start - src.offset, start + dst.offset, len);
+  }
+
+  static removeIntesectionSource(src: Range, merge: Range) {
+    if (src.srcEnd <= merge.srcStart || src.srcStart >= merge.srcEnd) {
+      return [src];
+    }
+    const result: Range[] = [];
+    if (src.srcEnd > merge.srcStart && merge.srcStart > src.srcStart) {
+      result.push(
+        new Range(src.srcStart, src.dstStart, merge.srcStart - src.srcStart)
+      );
+    }
+    if (src.srcEnd > merge.srcEnd && src.srcEnd > merge.srcEnd) {
+      const overlap = src.srcEnd - merge.srcEnd;
+      result.push(
+        new Range(src.srcEnd - overlap, src.dstEnd - overlap, overlap)
+      );
+    }
+    return result;
+  }
+
+  static removeDestinationIntesection(dst: Range, merge: Range) {
+    if (dst.dstEnd <= merge.dstStart || dst.dstStart >= merge.dstEnd) {
+      return [dst];
+    }
+    const result: Range[] = [];
+    if (dst.dstEnd > merge.dstStart && merge.dstStart > dst.dstStart) {
+      result.push(
+        new Range(dst.srcStart, dst.dstStart, merge.dstStart - dst.dstStart)
+      );
+    }
+    if (dst.dstEnd > merge.dstEnd && dst.dstEnd > merge.dstEnd) {
+      const overlap = dst.dstEnd - merge.dstEnd;
+      result.push(
+        new Range(dst.srcEnd - overlap, dst.dstEnd - overlap, overlap)
+      );
+    }
+    return result;
   }
 }
 

@@ -34,7 +34,7 @@ class NodeList {
     let expension = 0;
     for (let index = 0; index <= max; index++) {
       if (!containNode.has(index)) {
-        expension = expension + expansionLenght - 1;
+        expension += expansionLenght - 1;
       }
       expensionMap.set(index, expension);
     }
@@ -46,8 +46,8 @@ class NodeList {
 
   getSumOfShortestPath() {
     return this.nodes.reduce(
-      (sum, a, i, nodes) =>
-        sum + nodes.slice(i + 1).reduce((acc, b) => acc + a.distance(b), 0),
+      (acc, a, i, nodes) =>
+        acc + nodes.slice(i + 1).reduce((acc, b) => acc + a.distance(b), 0),
       0
     );
   }

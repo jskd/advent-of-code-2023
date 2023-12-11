@@ -15,32 +15,32 @@ class Node implements NodePosition {
 class NodeList {
   constructor(
     public nodes: Node[],
-    expansionLenght: number
+    expansionLength: number
   ) {
-    this.expand("x", expansionLenght);
-    this.expand("y", expansionLenght);
+    this.expand("x", expansionLength);
+    this.expand("y", expansionLength);
   }
 
-  expand(property: Position, expansionLenght: number) {
+  expand(position: Position, expansionLength: number) {
     const containNode = new Set<number>([]);
     const expensionMap = new Map<number, number>([]);
 
     let max = 0;
     this.nodes.forEach((node) => {
-      containNode.add(node[property]);
-      max = Math.max(max, node[property]);
+      containNode.add(node[position]);
+      max = Math.max(max, node[position]);
     });
 
     let expension = 0;
     for (let index = 0; index <= max; index++) {
       if (!containNode.has(index)) {
-        expension += expansionLenght - 1;
+        expension += expansionLength - 1;
       }
       expensionMap.set(index, expension);
     }
 
     this.nodes.forEach(
-      (node) => (node[property] += expensionMap.get(node[property])!)
+      (node) => (node[position] += expensionMap.get(node[position])!)
     );
   }
 
@@ -54,7 +54,7 @@ class NodeList {
 }
 
 export class Day11 {
-  static solve(input: string, expansionLenght: number): number {
+  static solve(input: string, expansionLength: number): number {
     const nodes = input
       .split(/[\r\n]+/)
       .flatMap((line, x) =>
@@ -62,6 +62,6 @@ export class Day11 {
           .split("")
           .flatMap((char, y) => (char === "#" ? [new Node(x, y)] : []))
       );
-    return new NodeList(nodes, expansionLenght).getSumOfShortestPath();
+    return new NodeList(nodes, expansionLength).getSumOfShortestPath();
   }
 }

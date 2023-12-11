@@ -1,11 +1,6 @@
-const pipeNorth = new Set<string>(["|", "L", "J", "S"]);
-const pipeSouth = new Set<string>(["|", "7", "F", "S"]);
-const pipeEast = new Set<string>(["-", "L", "F", "S"]);
-const pipeWest = new Set<string>(["-", "J", "7", "S"]);
-
 class Node {
-  neighbors: Node[] = [];
   steps?: number;
+  neighbors: Node[] = [];
 
   constructor(
     readonly x: number,
@@ -15,30 +10,31 @@ class Node {
 }
 
 class Graph {
-  startingNode: Node;
+  start: Node;
 
-  constructor(public nodes: Node[][]) {
-    const startingNode = this.nodes.flat().find(({ value }) => value === "S");
-    if (!startingNode) {
-      throw Error("No starting node");
+  constructor(readonly nodes: Node[][]) {
+    const start = this.nodes.flat().find(({ value }) => value === "S");
+    if (!start) {
+      throw Error("No start node");
     }
-    this.startingNode = startingNode;
+    this.start = start;
     this.markNeighbors();
-    this.markStepsFromStart();
-  }
-
-  getNode(x: number, y: number): Node | undefined {
-    return this.nodes.at(x)?.at(y);
+    this.markSteps();
   }
 
   markNeighbors(): void {
+    const pipeNorth = new Set<string>(["|", "L", "J", "S"]);
+    const pipeSouth = new Set<string>(["|", "7", "F", "S"]);
+    const pipeEast = new Set<string>(["-", "L", "F", "S"]);
+    const pipeWest = new Set<string>(["-", "J", "7", "S"]);
+
     this.nodes.flat().forEach((node) => {
-      const east = this.getNode(node.x, node.y + 1);
+      const east = this.nodes.at(node.x)?.at(node.y + 1);
       if (east && pipeEast.has(node.value) && pipeWest.has(east.value)) {
         node.neighbors.push(east);
         east.neighbors.push(node);
       }
-      const south = this.getNode(node.x + 1, node.y);
+      const south = this.nodes.at(node.x + 1)?.at(node.y);
       if (south && pipeSouth.has(node.value) && pipeNorth.has(south.value)) {
         node.neighbors.push(south);
         south.neighbors.push(node);
@@ -46,9 +42,9 @@ class Graph {
     });
   }
 
-  markStepsFromStart(): void {
-    const queue = new Array<Node>(this.startingNode);
-    this.startingNode.steps = 0;
+  markSteps(): void {
+    const queue = new Array<Node>(this.start);
+    this.start.steps = 0;
     for (let current = queue.shift(); current; current = queue.shift()) {
       for (const neighbor of current.neighbors) {
         if (neighbor.steps === undefined) {

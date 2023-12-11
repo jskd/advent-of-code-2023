@@ -46,13 +46,13 @@ class Graph {
   }
 
   replaceStartByPipe() {
-    const { neighbor: neighbors } = this.start;
-    if (neighbors.north && neighbors.south) this.start.value = "|";
-    else if (neighbors.east && neighbors.west) this.start.value = "-";
-    else if (neighbors.north && neighbors.east) this.start.value = "L";
-    else if (neighbors.north && neighbors.west) this.start.value = "J";
-    else if (neighbors.south && neighbors.west) this.start.value = "7";
-    else if (neighbors.south && neighbors.east) this.start.value = "F";
+    const { neighbor } = this.start;
+    if (neighbor.north && neighbor.south) this.start.value = "|";
+    else if (neighbor.east && neighbor.west) this.start.value = "-";
+    else if (neighbor.north && neighbor.east) this.start.value = "L";
+    else if (neighbor.north && neighbor.west) this.start.value = "J";
+    else if (neighbor.south && neighbor.west) this.start.value = "7";
+    else if (neighbor.south && neighbor.east) this.start.value = "F";
     else throw Error("Start without connexion");
   }
 

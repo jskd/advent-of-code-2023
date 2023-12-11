@@ -12,13 +12,16 @@ class Node implements NodePosition {
   }
 }
 
-class Graph {
-  constructor(public nodes: Node[]) {
-    this.expand("x");
-    this.expand("y");
+class NodeList {
+  constructor(
+    public nodes: Node[],
+    expansionLenght: number
+  ) {
+    this.expand("x", expansionLenght);
+    this.expand("y", expansionLenght);
   }
 
-  expand(property: Position) {
+  expand(property: Position, expansionLenght: number) {
     const containNode = new Set<number>([]);
     const expensionMap = new Map<number, number>([]);
 
@@ -31,7 +34,7 @@ class Graph {
     let expension = 0;
     for (let index = 0; index <= max; index++) {
       if (!containNode.has(index)) {
-        expension++;
+        expension = expension + expansionLenght - 1;
       }
       expensionMap.set(index, expension);
     }
@@ -42,17 +45,16 @@ class Graph {
   }
 
   getSumOfShortestPath() {
-    const nodes = [...this.nodes];
-    let sum = 0;
-    for (let current = nodes.shift(); current; current = nodes.shift()) {
-      sum += nodes.reduce((acc, node) => acc + node.distance(current!), 0);
-    }
-    return sum;
+    return this.nodes.reduce(
+      (sum, a, i, nodes) =>
+        sum + nodes.slice(i + 1).reduce((acc, b) => acc + a.distance(b), 0),
+      0
+    );
   }
 }
 
 export class Day11 {
-  static solve(input: string): number {
+  static solve(input: string, expansionLenght: number): number {
     const nodes = input
       .split(/[\r\n]+/)
       .flatMap((line, x) =>
@@ -60,6 +62,6 @@ export class Day11 {
           .split("")
           .flatMap((char, y) => (char === "#" ? [new Node(x, y)] : []))
       );
-    return new Graph(nodes).getSumOfShortestPath();
+    return new NodeList(nodes, expansionLenght).getSumOfShortestPath();
   }
 }

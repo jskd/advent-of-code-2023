@@ -72,14 +72,10 @@ class Graph {
   }
 
   markInLoop(): void {
-    const queue = new Array<Node>(this.startingNode);
-    for (let current = queue.shift(); current; current = queue.shift()) {
-      for (const neighbor of current.neighbors) {
-        if (!neighbor.isInLoop) {
-          neighbor.isInLoop = true;
-          queue.push(neighbor);
-        }
-      }
+    let current: Node | undefined = this.startingNode;
+    while (current) {
+      current.isInLoop = true;
+      current = current.neighbors.find(({ isInLoop }) => !isInLoop);
     }
   }
 

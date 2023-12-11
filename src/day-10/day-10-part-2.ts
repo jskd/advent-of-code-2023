@@ -1,12 +1,9 @@
-const pipeNorth = new Set<string>(["|", "L", "J", "S"]);
-const pipeSouth = new Set<string>(["|", "7", "F", "S"]);
-const pipeEast = new Set<string>(["-", "L", "F", "S"]);
-const pipeWest = new Set<string>(["-", "J", "7", "S"]);
-
 class Node {
-  neighbors: Node[] = [];
   isInLoop = false;
   isInside = false;
+  neighbor: Partial<{
+    [key in "north" | "south" | "east" | "west"]: Node;
+  }> = {};
 
   constructor(
     readonly x: number,
@@ -16,66 +13,58 @@ class Node {
 }
 
 class Graph {
-  startingNode: Node;
+  start: Node;
 
-  constructor(public nodes: Node[][]) {
-    const startingNode = this.nodes.flat().find(({ value }) => value === "S");
-    if (!startingNode) {
-      throw Error("No starting node");
+  constructor(readonly nodes: Node[][]) {
+    const start = this.nodes.flat().find(({ value }) => value === "S");
+    if (!start) {
+      throw Error("No start node");
     }
-    this.startingNode = startingNode;
-    this.startingNode.value = this.getStartPipe();
+    this.start = start;
     this.markNeighbors();
+    this.replaceStartByPipe();
     this.markInLoop();
     this.markInside();
   }
 
-  getNode(x: number, y: number): Node | undefined {
-    return this.nodes.at(x)?.at(y);
-  }
-
-  getStartPipe(): "|" | "L" | "J" | "7" | "F" | "-" {
-    const { x, y } = this.startingNode;
-
-    const northNeighbor = this.getNode(x - 1, y)?.value ?? "";
-    const eastNeighbor = this.getNode(x, y + 1)?.value ?? "";
-    const southNeighbor = this.getNode(x + 1, y)?.value ?? "";
-    const westNeighbor = this.getNode(x, y - 1)?.value ?? "";
-
-    const hasNorthNeighbor = pipeSouth.has(northNeighbor);
-    const hasEastNeightbor = pipeEast.has(westNeighbor);
-    const hasSouthNeightbor = pipeNorth.has(southNeighbor);
-    const hasWestNeightbor = pipeWest.has(eastNeighbor);
-
-    if (hasNorthNeighbor && hasSouthNeightbor) return "|";
-    else if (hasEastNeightbor && hasWestNeightbor) return "-";
-    else if (hasNorthNeighbor && hasEastNeightbor) return "L";
-    else if (hasNorthNeighbor && hasWestNeightbor) return "J";
-    else if (hasSouthNeightbor && hasWestNeightbor) return "7";
-    else if (hasSouthNeightbor && hasEastNeightbor) return "F";
-    else throw Error("Start without connexion");
-  }
-
   markNeighbors(): void {
+    const pipeNorth = new Set<string>(["|", "L", "J", "S"]);
+    const pipeSouth = new Set<string>(["|", "7", "F", "S"]);
+    const pipeEast = new Set<string>(["-", "L", "F", "S"]);
+    const pipeWest = new Set<string>(["-", "J", "7", "S"]);
+
     this.nodes.flat().forEach((node) => {
-      const east = this.getNode(node.x, node.y + 1);
+      const east = this.nodes.at(node.x)?.at(node.y + 1);
       if (east && pipeEast.has(node.value) && pipeWest.has(east.value)) {
-        node.neighbors.push(east);
-        east.neighbors.push(node);
+        east.neighbor.west = node;
+        node.neighbor.east = east;
       }
-      const south = this.getNode(node.x + 1, node.y);
+      const south = this.nodes.at(node.x + 1)?.at(node.y);
       if (south && pipeSouth.has(node.value) && pipeNorth.has(south.value)) {
-        node.neighbors.push(south);
-        south.neighbors.push(node);
+        south.neighbor.north = node;
+        node.neighbor.south = south;
       }
     });
   }
 
+  replaceStartByPipe() {
+    const { neighbor: neighbors } = this.start;
+    if (neighbors.north && neighbors.south) this.start.value = "|";
+    else if (neighbors.east && neighbors.west) this.start.value = "-";
+    else if (neighbors.north && neighbors.east) this.start.value = "L";
+    else if (neighbors.north && neighbors.west) this.start.value = "J";
+    else if (neighbors.south && neighbors.west) this.start.value = "7";
+    else if (neighbors.south && neighbors.east) this.start.value = "F";
+    else throw Error("Start without connexion");
+  }
+
   markInLoop(): void {
-    let current: Node | undefined = this.startingNode;
+    let current: Node | undefined = this.start;
     while (current) {
       current.isInLoop = true;
-      current = current.neighbors.find(({ isInLoop }) => !isInLoop);
+      current = Object.values(current.neighbor).find(
+        ({ isInLoop }) => !isInLoop
+      );
     }
   }
 
@@ -94,7 +83,7 @@ class Graph {
   }
 
   getNumberOfInside() {
-    return this.nodes.flat().filter((node) => node.isInside).length;
+    return this.nodes.flat().filter(({ isInside }) => isInside).length;
   }
 }
 

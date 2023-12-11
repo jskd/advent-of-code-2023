@@ -1,6 +1,11 @@
+const pipeNorth = new Set<string>(["|", "L", "J", "S"]);
+const pipeSouth = new Set<string>(["|", "7", "F", "S"]);
+const pipeEast = new Set<string>(["-", "L", "F", "S"]);
+const pipeWest = new Set<string>(["-", "J", "7", "S"]);
+
 class Node {
-  public neighbors: Node[] = [];
-  public steps?: number;
+  neighbors: Node[] = [];
+  steps?: number;
 
   constructor(
     readonly x: number,
@@ -13,11 +18,12 @@ class Graph {
   startingNode: Node;
 
   constructor(public nodes: Node[][]) {
-    const startingNode = this.nodes.flat().find((n) => n.value == "S");
+    const startingNode = this.nodes.flat().find(({ value }) => value === "S");
     if (!startingNode) {
-      throw Error("No starting");
+      throw Error("No starting node");
     }
     this.startingNode = startingNode;
+    this.markNeighbors();
     this.markStepsFromStart();
   }
 
@@ -25,25 +31,22 @@ class Graph {
     return this.nodes.at(x)?.at(y);
   }
 
-  markNeighbors(node: Node): void {
-    const connectUp = new Set<string>(["|", "L", "J", "S"]);
-    const connectDown = new Set<string>(["|", "7", "F", "S"]);
-    const connectRight = new Set<string>(["-", "L", "F", "S"]);
-    const connectLeft = new Set<string>(["-", "J", "7", "S"]);
-    const right = this.getNode(node.x, node.y + 1);
-    if (right && connectRight.has(node.value) && connectLeft.has(right.value)) {
-      node.neighbors.push(right);
-      right.neighbors.push(node);
-    }
-    const down = this.getNode(node.x + 1, node.y);
-    if (down && connectDown.has(node.value) && connectUp.has(down.value)) {
-      node.neighbors.push(down);
-      down.neighbors.push(node);
-    }
+  markNeighbors(): void {
+    this.nodes.flat().forEach((node) => {
+      const east = this.getNode(node.x, node.y + 1);
+      if (east && pipeEast.has(node.value) && pipeWest.has(east.value)) {
+        node.neighbors.push(east);
+        east.neighbors.push(node);
+      }
+      const south = this.getNode(node.x + 1, node.y);
+      if (south && pipeSouth.has(node.value) && pipeNorth.has(south.value)) {
+        node.neighbors.push(south);
+        south.neighbors.push(node);
+      }
+    });
   }
 
-  markStepsFromStart() {
-    this.nodes.flat().forEach((node) => this.markNeighbors(node));
+  markStepsFromStart(): void {
     const queue = new Array<Node>(this.startingNode);
     this.startingNode.steps = 0;
     for (let current = queue.shift(); current; current = queue.shift()) {

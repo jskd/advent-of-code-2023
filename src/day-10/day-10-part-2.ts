@@ -4,9 +4,9 @@ const pipeEast = new Set<string>(["-", "L", "F", "S"]);
 const pipeWest = new Set<string>(["-", "J", "7", "S"]);
 
 class Node {
-  public neighbors: Node[] = [];
-  public isInLoop = false;
-  public isInside = false;
+  neighbors: Node[] = [];
+  isInLoop = false;
+  isInside = false;
 
   constructor(
     readonly x: number,
@@ -19,13 +19,14 @@ class Graph {
   startingNode: Node;
 
   constructor(public nodes: Node[][]) {
-    const startingNode = this.nodes.flat().find((n) => n.value == "S");
+    const startingNode = this.nodes.flat().find(({ value }) => value === "S");
     if (!startingNode) {
       throw Error("No starting node");
     }
     this.startingNode = startingNode;
     this.startingNode.value = this.getStartPipe();
-    this.markLoop();
+    this.markNeighbors();
+    this.markInLoop();
     this.markInside();
   }
 
@@ -33,7 +34,7 @@ class Graph {
     return this.nodes.at(x)?.at(y);
   }
 
-  getStartPipe() {
+  getStartPipe(): "|" | "L" | "J" | "7" | "F" | "-" {
     const { x, y } = this.startingNode;
 
     const northNeighbor = this.getNode(x - 1, y)?.value ?? "";
@@ -55,21 +56,22 @@ class Graph {
     else throw Error("Start without connexion");
   }
 
-  markNeighbors(node: Node): void {
-    const east = this.getNode(node.x, node.y + 1);
-    if (east && pipeEast.has(node.value) && pipeWest.has(east.value)) {
-      node.neighbors.push(east);
-      east.neighbors.push(node);
-    }
-    const south = this.getNode(node.x + 1, node.y);
-    if (south && pipeSouth.has(node.value) && pipeNorth.has(south.value)) {
-      node.neighbors.push(south);
-      south.neighbors.push(node);
-    }
+  markNeighbors(): void {
+    this.nodes.flat().forEach((node) => {
+      const east = this.getNode(node.x, node.y + 1);
+      if (east && pipeEast.has(node.value) && pipeWest.has(east.value)) {
+        node.neighbors.push(east);
+        east.neighbors.push(node);
+      }
+      const south = this.getNode(node.x + 1, node.y);
+      if (south && pipeSouth.has(node.value) && pipeNorth.has(south.value)) {
+        node.neighbors.push(south);
+        south.neighbors.push(node);
+      }
+    });
   }
 
-  markLoop() {
-    this.nodes.flat().forEach((node) => this.markNeighbors(node));
+  markInLoop(): void {
     const queue = new Array<Node>(this.startingNode);
     for (let current = queue.shift(); current; current = queue.shift()) {
       for (const neighbor of current.neighbors) {
@@ -81,7 +83,7 @@ class Graph {
     }
   }
 
-  markInside() {
+  markInside(): void {
     const intersection = new Set<string>(["|", "L", "J"]);
     this.nodes.forEach((line) => {
       let inside = false;

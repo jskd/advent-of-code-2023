@@ -1,9 +1,7 @@
 class Node {
   isInLoop = false;
   isInside = false;
-  neighbor: Partial<{
-    [key in "north" | "south" | "east" | "west"]: Node;
-  }> = {};
+  neighbor: { [key in "north" | "east" | "south" | "west"]?: Node } = {};
 
   constructor(
     readonly x: number,

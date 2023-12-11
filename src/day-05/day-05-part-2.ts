@@ -29,6 +29,13 @@ export class Mapping {
   sourceToDestination?: Mapping;
   destinationToSource?: Mapping;
 
+  constructor(parent?: Mapping) {
+    if (parent) {
+      this.destinationToSource = parent;
+      parent.sourceToDestination = this;
+    }
+  }
+
   getCorrespondance(
     source: number,
     direction: "sourceToDestination" | "destinationToSource"
@@ -42,42 +49,14 @@ export class Mapping {
 
   getCandidateSeeds(): number[] {
     return this.ranges
-      .flatMap(({ sourceToDestination }) =>
-        [sourceToDestination.start, sourceToDestination.end - 1].map((v) =>
-          this.getCorrespondance(v, "sourceToDestination")
+      .flatMap(({ destinationToSource }) =>
+        [destinationToSource.start, destinationToSource.end - 1].map((node) =>
+          this.getCorrespondance(node, "destinationToSource")
         )
       )
       .concat(this.sourceToDestination?.getCandidateSeeds() ?? []);
   }
 }
-/*
-export abstract class Day05Part1 {
-  static solve(input: string): number {
-    const lines = input.split(/[\r\n]+/);
-    const seeds = lines[0]
-      .split(" ")
-      .map((number) => +number)
-      .filter(Boolean);
-
-    const start = new Mapping();
-    let currentMapping = start;
-    for (const line of lines) {
-      if (/^\d/.test(line)) {
-        const [dst, src, len] = line.split(" ").map((value) => +value);
-        currentMapping.ranges.push(new MappingEntry(src, dst, len));
-      } else if (currentMapping.ranges.length) {
-        currentMapping.sourceToDestination = new Mapping();
-        currentMapping = currentMapping.sourceToDestination;
-      }
-    }
-
-    return seeds.reduce(
-      (acc, seed) =>
-        Math.min(start.getCorrespondance(seed, "sourceToDestination"), acc),
-      Infinity
-    );
-  }
-}*/
 
 export abstract class Day05Part2 {
   static solve(input: string): number {
@@ -87,47 +66,32 @@ export abstract class Day05Part2 {
       .map((number) => +number)
       .filter(Boolean)
       .reduce(
-        (acc: Range[], val: number, index: number, src: number[]): Range[] =>
+        (acc: Range[], val, index, src) =>
           index % 2 === 0 ? [...acc, new Range(val, val, src[index + 1])] : acc,
         []
       );
 
-    const start = new Mapping();
-    //  start.ranges.push(...seedsRange);
-    //  start.sourceToDestination = new Mapping();
-
-    // let currentMapping = start.sourceToDestination;
-    let currentMapping = start;
+    const root = new Mapping();
+    let currentMapping = root;
     for (const line of lines) {
       if (/^\d/.test(line)) {
         const [dst, src, len] = line.split(" ").map((value) => +value);
         currentMapping.ranges.push(new MappingEntry(src, dst, len));
       } else if (currentMapping.ranges.length) {
-        const nextOne = new Mapping();
-
-        currentMapping.sourceToDestination = nextOne;
-        nextOne.destinationToSource = currentMapping;
-
-        currentMapping = nextOne;
+        currentMapping = new Mapping(currentMapping);
       }
     }
 
-    const best = start
+    const [best] = root
       .getCandidateSeeds()
-      .map((v) => currentMapping.getCorrespondance(v, "destinationToSource"))
-      .filter((v) => seedsRange.some((r) => r.isInside(v)))
-      .map((v) => start.getCorrespondance(v, "sourceToDestination"))
+      .filter((seed) => seedsRange.some((range) => range.isInside(seed)))
+      .map((seed) => root.getCorrespondance(seed, "sourceToDestination"))
       .sort(compare);
-
-    console.log(JSON.stringify(best));
 
     if (!best) {
       throw new Error("Seed not found");
     }
-
-    // fail 1004028601
-
-    return 0;
+    return best;
   }
 }
 

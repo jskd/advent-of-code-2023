@@ -30,7 +30,7 @@ describe("Day 5", function () {
     "60 56 37\r\n" +
     "56 93 4";
   it("Solve day 5 part 1 exemple", function () {
-    expect(Day05Part2.solve(example)).toBe(35);
+    expect(Day05Part2.solve(example)).toBe(46);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-05-input.txt`).toString();

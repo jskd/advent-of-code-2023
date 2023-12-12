@@ -1,21 +1,17 @@
 export class Range {
-  readonly start: number;
-  readonly end: number;
-  readonly offset: number;
-
-  constructor(source: number, destination: number, len: number) {
-    this.start = source;
-    this.end = source + len;
-    this.offset = destination - source;
-  }
+  constructor(
+    readonly source: number,
+    readonly destination: number,
+    readonly length: number
+  ) {}
 
   isInSource(value: number): boolean {
-    return this.start <= value && value < this.end;
+    return this.source <= value && value < this.source + this.length;
   }
 
   getDestination(value: number): number {
     if (!this.isInSource(value)) throw new Error("Value outside source");
-    return value + this.offset;
+    return value - this.source + this.destination;
   }
 }
 

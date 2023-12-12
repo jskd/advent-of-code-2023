@@ -1,106 +1,90 @@
-export class Range {
-  readonly start: number;
-  readonly end: number;
-  readonly offset: number;
+type Direction = "toSeed" | "toLocation";
+type DirectionProp<T> = {
+  [key in Direction]: T;
+};
 
-  constructor(source: number, destination: number, len: number) {
-    this.start = source;
-    this.end = source + len;
-    this.offset = destination - source;
+export class Range implements DirectionProp<Range> {
+  toLocation = this;
+  get toSeed(): Range {
+    return new Range(this.destination, this.source, this.length);
   }
 
-  isInside(source: number): boolean {
-    return this.start <= source && source < this.end;
+  constructor(
+    readonly source: number,
+    readonly destination: number,
+    readonly length: number
+  ) {}
+
+  isInside(value: number): boolean {
+    return this.source <= value && value < this.source + this.length;
+  }
+
+  getCorrespondance(value: number): number {
+    if (!this.isInside(value)) throw new Error("Value outside source");
+    return value - this.source + this.destination;
   }
 }
 
-export class MappingEntry {
-  sourceToDestination: Range;
-  destinationToSource: Range;
+export class AlmanacMap implements Partial<DirectionProp<AlmanacMap>> {
+  ranges: Range[] = [];
+  toLocation?: AlmanacMap;
+  toSeed?: AlmanacMap;
 
-  constructor(source: number, destination: number, len: number) {
-    this.sourceToDestination = new Range(source, destination, len);
-    this.destinationToSource = new Range(destination, source, len);
-  }
-}
-
-export class Mapping {
-  ranges: MappingEntry[] = [];
-  sourceToDestination?: Mapping;
-  destinationToSource?: Mapping;
-
-  constructor(parent?: Mapping) {
+  constructor(parent?: AlmanacMap) {
+    this.toSeed = parent;
     if (parent) {
-      this.destinationToSource = parent;
-      parent.sourceToDestination = this;
+      parent.toLocation = this;
     }
   }
 
-  getCorrespondance(
-    source: number,
-    direction: "sourceToDestination" | "destinationToSource"
-  ): number {
-    source +=
-      this.ranges
-        .map((entry) => entry[direction])
-        .find((range) => range.isInside(source))?.offset ?? 0;
-    return this[direction]?.getCorrespondance(source, direction) ?? source;
+  getCorrespondance(value: number, direction: Direction): number {
+    const range = this.ranges
+      .map((range) => range[direction])
+      .find((range) => range.isInside(value));
+    value = range?.getCorrespondance(value) ?? value;
+    return this[direction]?.getCorrespondance(value, direction) ?? value;
   }
 
-  getCandidateSeeds(): number[] {
+  // Get all seed on start position range
+  getLowerSeedCandidate(): number[] {
     return this.ranges
-      .flatMap(({ destinationToSource }) =>
-        [destinationToSource.start, destinationToSource.end - 1].map((node) =>
-          this.getCorrespondance(node, "destinationToSource")
-        )
-      )
-      .concat(this.sourceToDestination?.getCandidateSeeds() ?? []);
+      .map(({ toSeed }) => this.getCorrespondance(toSeed.source, "toSeed"))
+      .concat(this.toLocation?.getLowerSeedCandidate() ?? []);
   }
 }
 
 export abstract class Day05Part2 {
   static solve(input: string): number {
     const lines = input.split(/[\r\n]+/);
-    const seedsRange = lines[0]
+
+    const seedRanges = lines[0]
       .split(" ")
       .map((number) => +number)
       .filter(Boolean)
       .reduce(
-        (acc: Range[], val, index, src) =>
-          index % 2 === 0 ? [...acc, new Range(val, val, src[index + 1])] : acc,
+        (acc: Range[], val, idx, arr) =>
+          idx % 2 === 0 ? [...acc, new Range(val, val, arr[idx + 1])] : acc,
         []
       );
 
-    const root = new Mapping();
-    let currentMapping = root;
+    const rootMapping = new AlmanacMap();
+    let current = rootMapping;
     for (const line of lines) {
       if (/^\d/.test(line)) {
         const [dst, src, len] = line.split(" ").map((value) => +value);
-        currentMapping.ranges.push(new MappingEntry(src, dst, len));
-      } else if (currentMapping.ranges.length) {
-        currentMapping = new Mapping(currentMapping);
+        current.ranges.push(new Range(src, dst, len));
+      } else if (current.ranges.length) {
+        current = new AlmanacMap(current);
       }
     }
 
-    const [best] = root
-      .getCandidateSeeds()
-      .filter((seed) => seedsRange.some((range) => range.isInside(seed)))
-      .map((seed) => root.getCorrespondance(seed, "sourceToDestination"))
-      .sort(compare);
+    const [lowerLocation] = rootMapping
+      .getLowerSeedCandidate()
+      .filter((seed) => seedRanges.some((range) => range.isInside(seed)))
+      .map((seed) => rootMapping.getCorrespondance(seed, "toLocation"))
+      // Default sort doesn't work large number of input
+      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
 
-    if (!best) {
-      throw new Error("Seed not found");
-    }
-    return best;
-  }
-}
-
-function compare(a: number, b: number) {
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
+    return lowerLocation;
   }
 }

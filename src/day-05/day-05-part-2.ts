@@ -15,12 +15,12 @@ export class Range implements DirectionProp<Range> {
     readonly length: number
   ) {}
 
-  isInside(value: number): boolean {
+  isInSource(value: number): boolean {
     return this.source <= value && value < this.source + this.length;
   }
 
-  getCorrespondance(value: number): number {
-    if (!this.isInside(value)) throw new Error("Value outside source");
+  getDestination(value: number): number {
+    if (!this.isInSource(value)) throw new Error("Value outside source");
     return value - this.source + this.destination;
   }
 }
@@ -37,18 +37,18 @@ export class AlmanacMap implements Partial<DirectionProp<AlmanacMap>> {
     }
   }
 
-  getCorrespondance(value: number, direction: Direction): number {
+  getDestination(value: number, direction: Direction): number {
     const range = this.ranges
       .map((range) => range[direction])
-      .find((range) => range.isInside(value));
-    value = range?.getCorrespondance(value) ?? value;
-    return this[direction]?.getCorrespondance(value, direction) ?? value;
+      .find((range) => range.isInSource(value));
+    value = range?.getDestination(value) ?? value;
+    return this[direction]?.getDestination(value, direction) ?? value;
   }
 
   // Get all seed on start position range
   getLowerSeedCandidate(): number[] {
     return this.ranges
-      .map(({ toSeed }) => this.getCorrespondance(toSeed.source, "toSeed"))
+      .map(({ toSeed }) => this.getDestination(toSeed.source, "toSeed"))
       .concat(this.toLocation?.getLowerSeedCandidate() ?? []);
   }
 }
@@ -80,8 +80,8 @@ export abstract class Day05Part2 {
 
     const [lowerLocation] = rootMapping
       .getLowerSeedCandidate()
-      .filter((seed) => seedRanges.some((range) => range.isInside(seed)))
-      .map((seed) => rootMapping.getCorrespondance(seed, "toLocation"))
+      .filter((seed) => seedRanges.some((range) => range.isInSource(seed)))
+      .map((seed) => rootMapping.getDestination(seed, "toLocation"))
       // Default sort doesn't work large number of input
       .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
 

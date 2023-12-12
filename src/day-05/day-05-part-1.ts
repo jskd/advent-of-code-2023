@@ -8,17 +8,25 @@ export class Range {
     this.end = source + len;
     this.offset = destination - source;
   }
+
+  isInSource(value: number): boolean {
+    return this.start <= value && value < this.end;
+  }
+
+  getDestination(value: number): number {
+    if (!this.isInSource(value)) throw new Error("Value outside source");
+    return value + this.offset;
+  }
 }
 
-export class Mapping {
+export class AlmanacMap {
   ranges: Range[] = [];
-  next?: Mapping;
+  nextAlmanac?: AlmanacMap;
 
-  getDestination(source: number): number {
-    source +=
-      this.ranges.find(({ start, end }) => start <= source && source < end)
-        ?.offset ?? 0;
-    return this.next ? this.next.getDestination(source) : source;
+  getDestination(value: number): number {
+    const range = this.ranges.find((range) => range.isInSource(value));
+    value = range?.getDestination(value) ?? value;
+    return this.nextAlmanac ? this.nextAlmanac.getDestination(value) : value;
   }
 }
 
@@ -30,15 +38,15 @@ export abstract class Day05Part1 {
       .map((number) => +number)
       .filter(Boolean);
 
-    const start = new Mapping();
+    const start = new AlmanacMap();
     let currentMapping = start;
     for (const line of lines) {
       if (/^\d/.test(line)) {
         const [dst, src, len] = line.split(" ").map((value) => +value);
         currentMapping.ranges.push(new Range(src, dst, len));
       } else if (currentMapping.ranges.length) {
-        currentMapping.next = new Mapping();
-        currentMapping = currentMapping.next;
+        currentMapping.nextAlmanac = new AlmanacMap();
+        currentMapping = currentMapping.nextAlmanac;
       }
     }
 

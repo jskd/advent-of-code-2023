@@ -34,20 +34,20 @@ export abstract class Day05Part1 {
       .map((number) => +number)
       .filter(Boolean);
 
-    const start = new AlmanacMap();
-    let currentMapping = start;
+    const rootAlmanac = new AlmanacMap();
+    let current = rootAlmanac;
     for (const line of lines) {
       if (/^\d/.test(line)) {
         const [dst, src, len] = line.split(" ").map((value) => +value);
-        currentMapping.ranges.push(new Range(src, dst, len));
-      } else if (currentMapping.ranges.length) {
-        currentMapping.nextAlmanac = new AlmanacMap();
-        currentMapping = currentMapping.nextAlmanac;
+        current.ranges.push(new Range(src, dst, len));
+      } else if (current.ranges.length) {
+        current.nextAlmanac = new AlmanacMap();
+        current = current.nextAlmanac;
       }
     }
 
     return seeds.reduce(
-      (acc, seed) => Math.min(start.getDestination(seed), acc),
+      (acc, seed) => Math.min(rootAlmanac.getDestination(seed), acc),
       Infinity
     );
   }

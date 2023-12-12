@@ -67,8 +67,8 @@ export abstract class Day05Part2 {
         []
       );
 
-    const rootMapping = new AlmanacMap();
-    let current = rootMapping;
+    const rootAlmanac = new AlmanacMap();
+    let current = rootAlmanac;
     for (const line of lines) {
       if (/^\d/.test(line)) {
         const [dst, src, len] = line.split(" ").map((value) => +value);
@@ -78,10 +78,10 @@ export abstract class Day05Part2 {
       }
     }
 
-    const [lowerLocation] = rootMapping
+    const [lowerLocation] = rootAlmanac
       .getLowerSeedCandidate()
       .filter((seed) => seedRanges.some((range) => range.isInSource(seed)))
-      .map((seed) => rootMapping.getDestination(seed, "toLocation"))
+      .map((seed) => rootAlmanac.getDestination(seed, "toLocation"))
       // Default sort doesn't work large number of input
       .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
 

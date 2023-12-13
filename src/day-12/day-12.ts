@@ -1,8 +1,20 @@
 export type Tile = "#" | "?";
 
-export function evaluateArrangement(line: string, group: number) {
+export function evaluateArrangement(line: string, group: number): number {
   if (line.length < group) {
     return 0;
+  }
+
+  if (line.includes(".")) {
+    const lines = line.split(".").filter(Boolean);
+    const withShap = lines.filter((line) => line.includes("#"));
+    if (withShap.length > 1) {
+      return 0;
+    } else if (withShap.length === 1) {
+      return evaluateArrangement(withShap[0], group);
+    } else {
+      return lines.reduce((acc, v) => acc + evaluateArrangement(v, group), 0);
+    }
   }
 
   const start = line.indexOf("#");

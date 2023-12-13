@@ -20,6 +20,14 @@ describe("Day 12", function () {
     expect(evaluateArrangement("??##?#??", 6)).toBe(3);
     expect(evaluateArrangement("??####??", 3)).toBe(0);
     expect(evaluateArrangement("########", 8)).toBe(1);
+
+    expect(evaluateArrangement("###.####", 8)).toBe(0);
+    expect(evaluateArrangement("???.????", 3)).toBe(3);
+    expect(evaluateArrangement("??#.????", 3)).toBe(1);
+    expect(evaluateArrangement("??#.??#?", 3)).toBe(0);
+    expect(evaluateArrangement("?#?.??.?", 2)).toBe(2);
+    expect(evaluateArrangement("?#?.??.?", 3)).toBe(1);
+    expect(evaluateArrangement("??...?.?", 1)).toBe(4);
   });
 
   it("Evaluate arrangement", function () {

@@ -49,51 +49,37 @@ export function evaluateArrangement(line: string, group: number): number {
 const mapTest = new Map<string, number>();
 
 export function evaluate(line: string, group: number[]): number {
-  const result = mapTest.get(line + group);
-  if (result) {
-    return result;
-  }
-
   if (group.length === 1) {
-    const result = mapTest.get(line + group[0]);
-    if (result) {
-      return result;
-    } else {
-      const val = evaluateArrangement(line, group[0]);
-      mapTest.set(line + group[0], val);
-      return val;
-    }
+    return evaluateArrangement(line, group[0]);
   }
 
   let posibilities = 0;
   const nextGroup = group.slice(1);
   const sizeOfnextGroup = nextGroup.reduce((acc, v) => acc + 1 + v, -1);
 
-  for (let i = 0; i < line.length; i++) {
-    const before = line.substring(0, i);
-    const current = line.substring(i, i + group[0]);
-    const separator = line.charAt(i + group[0]);
-    const after = line.substring(i + group[0] + 1);
+  const firstDieze = line.indexOf("#");
+  let nextDot = line.indexOf(".");
 
+  for (let i = 0; i < line.length; i++) {
     if (
-      current.length < group[0] ||
-      before.includes("#") ||
-      after.length < sizeOfnextGroup
+      (firstDieze != -1 && i - 1 >= firstDieze) ||
+      line.length - i + group[0] + 1 < sizeOfnextGroup ||
+      line.length - i < group[0]
     ) {
       return posibilities;
     }
-    if (current.includes(".") || separator === "#") {
+
+    if (nextDot != -1 && i <= nextDot && nextDot < i + group[0]) {
+      i = nextDot;
+      nextDot = line.indexOf(".", nextDot + 1);
       continue;
     }
 
-    const result = mapTest.get(after + nextGroup);
-    if (result) {
-      posibilities += result;
-    } else {
-      const val = evaluate(after, nextGroup);
-      mapTest.set(after + nextGroup, val);
-      posibilities += val;
+    if (line.charAt(i + group[0]) === "#") {
+      continue;
     }
+
+    posibilities += evaluate(line.substring(i + group[0] + 1), nextGroup);
   }
 
   mapTest.set(line + group, posibilities);

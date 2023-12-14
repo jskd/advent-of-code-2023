@@ -49,6 +49,15 @@ describe("Day 12", function () {
     });
   });
 
+  it("Evaluate arrangement", function () {
+    let sequence = new Sequence(".??..??...?##.", [1, 1, 3]).unfold();
+    expect(evaluate(sequence.line, sequence.groups)).toBe(16384);
+    sequence = new Sequence("????.######..#####.", [1, 6, 5]).unfold();
+    expect(evaluate(sequence.line, sequence.groups)).toBe(2500);
+    sequence = new Sequence("?###????????", [3, 2, 1]).unfold();
+    expect(evaluate(sequence.line, sequence.groups)).toBe(506250);
+  });
+
   it("Solve day 2 part 1", function () {
     const content = fs.readFileSync(`${__dirname}/day-12-input.txt`);
     expect(Day12.solve(content.toString())).toBe(7110);

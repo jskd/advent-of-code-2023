@@ -15,18 +15,57 @@ export class Sequence {
   }
 }
 
+export function evaluateArrangement(line: string, group: number): number {
+  if (line.length < group) {
+    return 0;
+  }
+
+  if (line.includes(".")) {
+    const lines = line.split(".").filter(Boolean);
+    const withShap = lines.filter((line) => line.includes("#"));
+    if (withShap.length > 1) {
+      return 0;
+    } else if (withShap.length === 1) {
+      return evaluateArrangement(withShap[0], group);
+    } else {
+      return lines.reduce((acc, v) => acc + evaluateArrangement(v, group), 0);
+    }
+  }
+
+  const start = line.indexOf("#");
+  if (start === -1) {
+    return line.length - group + 1;
+  }
+  const end = line.lastIndexOf("#");
+  if (end - start > group) {
+    return 0;
+  }
+
+  const lowStart = Math.max(end - group + 1, 0);
+  const highStart = Math.min(start, line.length - group);
+  return highStart - lowStart + 1;
+}
+
+const mapTest = new Map<string, number>();
+
 export function evaluate(line: string, group: number[]): number {
+  const result = mapTest.get(line + group);
+  if (result) {
+    return result;
+  }
+
+  if (group.length === 1) {
+    const result = mapTest.get(line + group[0]);
+    if (result) {
+      return result;
+    } else {
+      const val = evaluateArrangement(line, group[0]);
+      mapTest.set(line + group[0], val);
+      return val;
+    }
+  }
+
   let posibilities = 0;
-
-  if (!line.length) {
-    posibilities = !group.length ? 1 : 0;
-    return posibilities;
-  }
-  if (!group.length) {
-    posibilities = line.includes("#") ? 0 : 1;
-    return posibilities;
-  }
-
   const nextGroup = group.slice(1);
   const sizeOfnextGroup = nextGroup.reduce((acc, v) => acc + 1 + v, -1);
 
@@ -47,9 +86,17 @@ export function evaluate(line: string, group: number[]): number {
       continue;
     }
 
-    posibilities += evaluate(after, nextGroup);
+    const result = mapTest.get(after + nextGroup);
+    if (result) {
+      posibilities += result;
+    } else {
+      const val = evaluate(after, nextGroup);
+      mapTest.set(after + nextGroup, val);
+      posibilities += val;
+    }
   }
 
+  mapTest.set(line + group, posibilities);
   return posibilities;
 }
 

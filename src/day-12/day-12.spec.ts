@@ -1,4 +1,4 @@
-import { Day12, evaluate } from "./day-12";
+import { Day12, Day12Part2, Sequence, evaluate } from "./day-12";
 import fs from "fs";
 
 describe("Day 12", function () {
@@ -42,8 +42,20 @@ describe("Day 12", function () {
     expect(evaluate("?###????????", [3, 2, 1])).toBe(10);
   });
 
-  it("Solve day 2 part 2", function () {
+  it("Solve day 2 part 1", function () {
+    expect(new Sequence(".#", [1]).unfold()).toEqual({
+      groups: [1, 1, 1, 1, 1],
+      line: ".#?.#?.#?.#?.#",
+    });
+  });
+
+  it("Solve day 2 part 1", function () {
     const content = fs.readFileSync(`${__dirname}/day-12-input.txt`);
     expect(Day12.solve(content.toString())).toBe(7110);
   });
+
+  /* it("Solve day 2 part 2", function () {
+    const content = fs.readFileSync(`${__dirname}/day-12-input.txt`);
+    expect(Day12Part2.solve(content.toString())).toBe(7110);
+  });*/
 });

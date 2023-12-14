@@ -63,8 +63,8 @@ describe("Day 12", function () {
     expect(Day12.solve(content.toString())).toBe(7110);
   });
 
-  /* it("Solve day 2 part 2", function () {
+  it("Solve day 2 part 2", function () {
     const content = fs.readFileSync(`${__dirname}/day-12-input.txt`);
     expect(Day12Part2.solve(content.toString())).toBe(7110);
-  });*/
+  });
 });

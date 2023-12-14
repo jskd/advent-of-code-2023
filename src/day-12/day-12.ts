@@ -46,8 +46,6 @@ export function evaluateArrangement(line: string, group: number): number {
   return highStart - lowStart + 1;
 }
 
-const mapTest = new Map<string, number>();
-
 export function evaluate(line: string, group: number[]): number {
   if (group.length === 1) {
     return evaluateArrangement(line, group[0]);
@@ -59,6 +57,19 @@ export function evaluate(line: string, group: number[]): number {
 
   const firstDieze = line.indexOf("#");
   let nextDot = line.indexOf(".");
+
+  if (
+    nextDot != -1 &&
+    firstDieze != -1 &&
+    firstDieze < nextDot &&
+    nextDot <= group[0] + group[1] &&
+    firstDieze < group[0] + group[1]
+  ) {
+    return (
+      evaluateArrangement(line.substring(0, nextDot), group[0]) *
+      evaluate(line.substring(nextDot + 1), nextGroup)
+    );
+  }
 
   for (let i = 0; i < line.length; i++) {
     if (
@@ -82,7 +93,6 @@ export function evaluate(line: string, group: number[]): number {
     posibilities += evaluate(line.substring(i + group[0] + 1), nextGroup);
   }
 
-  mapTest.set(line + group, posibilities);
   return posibilities;
 }
 

@@ -6,17 +6,12 @@ const getPosibilities = memoizee(
       return groups.length || counter ? 0 : 1;
     }
 
-    if (groups[0] < counter) {
+    if (counter > groups[0]) {
       return 0;
     }
 
-    const minSize = groups.reduce((acc, v) => acc + 1 + v, -counter);
-    if (line.length < minSize) {
-      return 0;
-    }
-
-    const nextDot = line.indexOf(".");
-    if (nextDot != -1 && counter && nextDot < groups[0] - counter) {
+    const minimumLength = groups.reduce((acc, v) => acc + 1 + v, -counter);
+    if (line.length < minimumLength) {
       return 0;
     }
 

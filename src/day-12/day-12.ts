@@ -5,20 +5,16 @@ const getPosibilities = memoizee(
     if (!line) {
       return groups.length || counter ? 0 : 1;
     }
-
     let posibilities = 0;
-    const branchs = line[0] === "?" ? [".", "#"] : [line[0]];
-    for (const branch of branchs) {
-      if (branch === "#") {
-        posibilities += getPosibilities(line.slice(1), groups, counter + 1);
-      } else {
-        if (!counter) {
-          posibilities += getPosibilities(line.slice(1), groups);
-        }
-        if (groups[0] == counter) {
-          posibilities += getPosibilities(line.slice(1), groups.slice(1));
-        }
+    if (line[0] === "?" || line[0] === ".") {
+      if (!counter) {
+        posibilities += getPosibilities(line.slice(1), groups);
+      } else if (groups[0] == counter) {
+        posibilities += getPosibilities(line.slice(1), groups.slice(1));
       }
+    }
+    if (line[0] === "?" || line[0] === "#") {
+      posibilities += getPosibilities(line.slice(1), groups, counter + 1);
     }
     return posibilities;
   },

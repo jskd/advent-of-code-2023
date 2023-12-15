@@ -5,6 +5,21 @@ const getPosibilities = memoizee(
     if (!line) {
       return groups.length || counter ? 0 : 1;
     }
+
+    if (groups[0] < counter) {
+      return 0;
+    }
+
+    const minSize = groups.reduce((acc, v) => acc + 1 + v, -counter);
+    if (line.length < minSize) {
+      return 0;
+    }
+
+    const nextDot = line.indexOf(".");
+    if (nextDot != -1 && counter && nextDot < groups[0] - counter) {
+      return 0;
+    }
+
     let posibilities = 0;
     if (line[0] === "?" || line[0] === ".") {
       if (!counter) {
@@ -14,7 +29,8 @@ const getPosibilities = memoizee(
       }
     }
     if (line[0] === "?" || line[0] === "#") {
-      posibilities += getPosibilities(line.slice(1), groups, counter + 1);
+      const next = line.slice(1).search(/[.?]/) + 1 || 1;
+      posibilities += getPosibilities(line.slice(next), groups, counter + next);
     }
     return posibilities;
   },

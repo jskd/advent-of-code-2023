@@ -43,7 +43,7 @@ describe("Day 12", function () {
     expect(Day12.solve(content)).toBe(7110);
   });
 
-  xit("Solve day 12 part 2", function () {
+  it("Solve day 12 part 2", function () {
     expect(Day12.solve(content, true)).toBe(1566786613613);
   });
 });

@@ -41,7 +41,7 @@ const getPosibilities = memoizee(
 );
 
 export function evaluate(line: string, groups: number[]): number {
-  return getPosibilities(line + ".", groups);
+  return getPosibilities(line.replace(/\.+/, ".") + ".", groups);
 }
 
 export class Day12 {

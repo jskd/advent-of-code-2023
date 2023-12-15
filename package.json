@@ -15,5 +15,9 @@
   "scripts": {
     "test": "jest",
     "start": "npx ts-node ./src/day-05/index.ts"
+  },
+  "dependencies": {
+    "@types/memoizee": "^0.4.11",
+    "memoizee": "^0.4.15"
   }
 }

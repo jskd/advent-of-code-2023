@@ -20,29 +20,39 @@ class Tile {
   ) {}
 
   getNextDirection(source: Direction): Direction[] {
-    switch (this.value) {
-      case "/":
-        if (source === "down") return ["left"];
-        else if (source === "left") return ["down"];
-        else if (source === "right") return ["up"];
-        else if (source === "up") return ["right"];
-        break;
-      case "\\":
-        if (source === "down") return ["right"];
-        else if (source === "left") return ["up"];
-        else if (source === "right") return ["down"];
-        else if (source === "up") return ["left"];
-        break;
-      case "-":
-        return source === "up" || source === "down"
-          ? ["left", "right"]
-          : [source];
-      case "|":
-        return source === "left" || source === "right"
-          ? ["up", "down"]
-          : [source];
-    }
-    return [source];
+    const mapping: Record<TileType, Record<Direction, Direction[]>> = {
+      ".": {
+        left: ["left"],
+        right: ["right"],
+        up: ["up"],
+        down: ["down"],
+      },
+      "/": {
+        left: ["down"],
+        right: ["up"],
+        up: ["right"],
+        down: ["left"],
+      },
+      "\\": {
+        left: ["up"],
+        right: ["down"],
+        up: ["left"],
+        down: ["right"],
+      },
+      "|": {
+        left: ["up", "down"],
+        right: ["up", "down"],
+        up: ["up"],
+        down: ["down"],
+      },
+      "-": {
+        left: ["left"],
+        right: ["right"],
+        up: ["left", "right"],
+        down: ["left", "right"],
+      },
+    };
+    return mapping[this.value][source];
   }
 
   resetMarking() {

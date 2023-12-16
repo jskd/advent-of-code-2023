@@ -78,9 +78,7 @@ class Graph {
   getNumber(x: number, y: number, dir: Direction) {
     this.tiles.flat().forEach((t) => t.resetMarking());
     this.travel(x, y, dir);
-    return this.tiles
-      .flat()
-      .filter((v) => Object.values(v.isExploredFrom).some(Boolean)).length;
+    return this.tiles.flat().filter((v) => v.isExplored).length;
   }
 
   travel(x: number, y: number, direction: Direction) {

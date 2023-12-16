@@ -1,43 +1,33 @@
 import memoizee from "memoizee";
 
-const getPosibilities = memoizee(
-  (line: string, groups: number[], counter = 0): number => {
+export const evaluate = memoizee(
+  (line: string, groups: number[]): number => {
     if (!line) {
-      return groups.length || counter ? 0 : 1;
+      return groups.length ? 0 : 1;
+    }
+    if (!groups.length) {
+      return line.includes("#") ? 0 : 1;
     }
 
-    if (counter > groups[0]) {
-      return 0;
-    }
-
-    const minimumLength = groups.reduce((acc, v) => acc + 1 + v, -counter);
-    if (line.length < minimumLength) {
-      return 0;
-    }
-
-    let posibilities = 0;
+    let possibilities = 0;
     if (line[0] === "?" || line[0] === ".") {
-      if (!counter) {
-        posibilities += getPosibilities(line.slice(1), groups);
-      } else if (groups[0] == counter) {
-        posibilities += getPosibilities(line.slice(1), groups.slice(1));
-      }
+      possibilities += evaluate(line.slice(1), groups);
     }
     if (line[0] === "?" || line[0] === "#") {
-      const next = line.slice(1).search(/[.?]/) + 1 || 1;
-      posibilities += getPosibilities(line.slice(next), groups, counter + next);
+      // Check no "#" next to the group area
+      if (line.length >= groups[0] && line[groups[0]] != "#") {
+        // Check no "." in the group area
+        if (line.lastIndexOf(".", groups[0] - 1) === -1) {
+          possibilities += evaluate(line.slice(groups[0] + 1), groups.slice(1));
+        }
+      }
     }
-    return posibilities;
+    return possibilities;
   },
   {
-    length: false,
     primitive: true,
   }
 );
-
-export function evaluate(line: string, groups: number[]): number {
-  return getPosibilities(line.replace(/\.+/, ".") + ".", groups);
-}
 
 export class Day12 {
   static solve(input: string, unfold = false): number {

@@ -2,7 +2,7 @@ import { Day12, evaluate } from "./day-12";
 import fs from "fs";
 
 describe("Day 12", function () {
-  it("Evaluate arrangement", function () {
+  it("Get number of arrangement possible", function () {
     expect(evaluate("????????", [5])).toBe(4);
     expect(evaluate("????????", [3])).toBe(6);
     expect(evaluate("????????", [9])).toBe(0);

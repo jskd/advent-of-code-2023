@@ -1,5 +1,6 @@
 type Direction = "left" | "right" | "up" | "down";
 type TileType = "." | "/" | "\\" | "|" | "-";
+
 class Tile {
   isExploredFrom: Record<Direction, boolean> = {
     left: false,
@@ -43,86 +44,68 @@ class Tile {
     }
     return [source];
   }
+
+  resetMarking() {
+    this.isExploredFrom = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+    };
+  }
 }
 
 class Graph {
   constructor(readonly tiles: Tile[][]) {}
 
-  getNumberOfInside() {
-    return this.getNumber(this.tiles[0][0], "right");
+  getNumberFromTopRight() {
+    return this.getNumber(0, 0, "right");
   }
 
-  getNumber(dst: Tile, dir: Direction) {
-    this.tiles.flat().forEach(
-      (t) =>
-        (t.isExploredFrom = {
-          left: false,
-          right: false,
-          up: false,
-          down: false,
-        })
-    );
-    this.travel(dst, dir);
+  getBestStart() {
+    let max = 0;
+    for (let i = 0; i < this.tiles.length; i++) {
+      max = Math.max(this.getNumber(i, 0, "right"), max);
+      max = Math.max(this.getNumber(i, -1, "left"), max);
+    }
+    for (let i = 0; i < this.tiles[0].length; i++) {
+      max = Math.max(this.getNumber(0, i, "down"), max);
+      max = Math.max(this.getNumber(-1, i, "up"), max);
+    }
+    return max;
+  }
+
+  getNumber(x: number, y: number, dir: Direction) {
+    this.tiles.flat().forEach((t) => t.resetMarking());
+    this.travel(x, y, dir);
     return this.tiles
       .flat()
       .filter((v) => Object.values(v.isExploredFrom).some(Boolean)).length;
   }
 
-  getBestStart() {
-    let max = 0;
-    let lines = this.tiles.map((_, index) => index);
-    max = lines.reduce(
-      (acc, i) =>
-        (acc = Math.max(acc, this.getNumber(this.tiles[i][0], "right"), max))
-    );
-    max = lines.reduce(
-      (acc, i) =>
-        (acc = Math.max(
-          acc,
-          this.getNumber(this.tiles[i].at(-1)!, "left"),
-          max
-        ))
-    );
-
-    lines = this.tiles[1].map((_, index) => index);
-
-    max = lines.reduce(
-      (acc, i) =>
-        (acc = Math.max(acc, this.getNumber(this.tiles[0][i], "down"), max))
-    );
-    max = lines.reduce(
-      (acc, i) =>
-        (acc = Math.max(acc, this.getNumber(this.tiles.at(-1)![i], "up"), max))
-    );
-
-    return max;
-  }
-
-  travel(dst: Tile, dir: Direction) {
-    const queue: {
-      dst: Tile;
-      dir: Direction;
-    }[] = [{ dst: dst, dir: dir }];
+  travel(x: number, y: number, direction: Direction) {
+    const queue = [{ tile: this.tiles.at(x)!.at(y)!, direction: direction }];
     let current = queue.shift();
 
     while (current) {
-      if (!current.dst.isExploredFrom[current.dir]) {
-        current.dst.isExploredFrom[current.dir] = true;
-        for (const pouet of current.dst.getNextDirection(current.dir)) {
+      const { direction, tile } = current;
+      if (!tile.isExploredFrom[direction]) {
+        tile.isExploredFrom[direction] = true;
+        tile.getNextDirection(current.direction).forEach((nextDirection) => {
           let destination = undefined;
-          if (pouet === "left" && this.tiles[current.dst.x]) {
-            destination = this.tiles[current.dst.x][current.dst.y - 1];
-          } else if (pouet === "right" && this.tiles[current.dst.x]) {
-            destination = this.tiles[current.dst.x][current.dst.y + 1];
-          } else if (pouet === "up" && this.tiles[current.dst.x - 1]) {
-            destination = this.tiles[current.dst.x - 1][current.dst.y];
-          } else if (pouet === "down" && this.tiles[current.dst.x + 1]) {
-            destination = this.tiles[current.dst.x + 1][current.dst.y];
+          if (nextDirection === "left" && this.tiles[tile.x]) {
+            destination = this.tiles[tile.x][tile.y - 1];
+          } else if (nextDirection === "right" && this.tiles[tile.x]) {
+            destination = this.tiles[tile.x][tile.y + 1];
+          } else if (nextDirection === "up" && this.tiles[tile.x - 1]) {
+            destination = this.tiles[tile.x - 1][tile.y];
+          } else if (nextDirection === "down" && this.tiles[tile.x + 1]) {
+            destination = this.tiles[tile.x + 1][tile.y];
           }
           if (destination) {
-            queue.push({ dst: destination, dir: pouet });
+            queue.push({ tile: destination, direction: nextDirection });
           }
-        }
+        });
       }
       current = queue.shift();
     }
@@ -130,13 +113,14 @@ class Graph {
 }
 
 export class Day16 {
-  static solve(input: string): number {
-    const nodes = input
+  static solve(input: string, part: "1" | "2"): number {
+    const tiles = input
       .split(/[\r\n]+/)
       .filter(Boolean)
       .map((line, x) =>
         line.split("").map((value, y) => new Tile(x, y, value as TileType))
       );
-    return new Graph(nodes).getBestStart();
+    const graph = new Graph(tiles);
+    return part === "1" ? graph.getNumberFromTopRight() : graph.getBestStart();
   }
 }

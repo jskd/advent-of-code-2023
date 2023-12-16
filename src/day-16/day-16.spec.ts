@@ -21,4 +21,8 @@ describe("Day 12", function () {
   it("Solve day 12 part 1", function () {
     expect(Day16.solve(content)).toBe(8249);
   });
+
+  it("Solve day 12 part 2", function () {
+    expect(Day16.solve(content)).toBe(8444);
+  });
 });

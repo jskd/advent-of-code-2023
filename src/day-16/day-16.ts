@@ -46,14 +46,56 @@ class Tile {
 }
 
 class Graph {
-  constructor(readonly tiles: Tile[][]) {
-    this.travel(this.tiles[0][0], "right");
-  }
+  constructor(readonly tiles: Tile[][]) {}
 
   getNumberOfInside() {
+    return this.getNumber(this.tiles[0][0], "right");
+  }
+
+  getNumber(dst: Tile, dir: Direction) {
+    this.tiles.flat().forEach(
+      (t) =>
+        (t.isExploredFrom = {
+          left: false,
+          right: false,
+          up: false,
+          down: false,
+        })
+    );
+    this.travel(dst, dir);
     return this.tiles
       .flat()
       .filter((v) => Object.values(v.isExploredFrom).some(Boolean)).length;
+  }
+
+  getBestStart() {
+    let max = 0;
+    let lines = this.tiles.map((_, index) => index);
+    max = lines.reduce(
+      (acc, i) =>
+        (acc = Math.max(acc, this.getNumber(this.tiles[i][0], "right"), max))
+    );
+    max = lines.reduce(
+      (acc, i) =>
+        (acc = Math.max(
+          acc,
+          this.getNumber(this.tiles[i].at(-1)!, "left"),
+          max
+        ))
+    );
+
+    lines = this.tiles[1].map((_, index) => index);
+
+    max = lines.reduce(
+      (acc, i) =>
+        (acc = Math.max(acc, this.getNumber(this.tiles[0][i], "down"), max))
+    );
+    max = lines.reduce(
+      (acc, i) =>
+        (acc = Math.max(acc, this.getNumber(this.tiles.at(-1)![i], "up"), max))
+    );
+
+    return max;
   }
 
   travel(dst: Tile, dir: Direction) {
@@ -95,6 +137,6 @@ export class Day16 {
       .map((line, x) =>
         line.split("").map((value, y) => new Tile(x, y, value as TileType))
       );
-    return new Graph(nodes).getNumberOfInside();
+    return new Graph(nodes).getBestStart();
   }
 }

@@ -41,7 +41,7 @@ class Tile {
     down: false,
   };
 
-  get isExplored(): boolean {
+  get isTravel(): boolean {
     return Object.values(this.isTravelFrom).some(Boolean);
   }
 
@@ -87,7 +87,7 @@ class Graph {
     const source = this.tiles.at(x)?.at(y);
     if (!source) throw Error("Tile not found");
     this.markTravel(source, dir);
-    return this.tiles.flat().filter((v) => v.isExplored).length;
+    return this.tiles.flat().filter((v) => v.isTravel).length;
   }
 
   getNeighbor(x: number, y: number, direction: Direction): Tile | undefined {

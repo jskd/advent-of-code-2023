@@ -1,8 +1,40 @@
 type Direction = "left" | "right" | "up" | "down";
 type TileType = "." | "/" | "\\" | "|" | "-";
+const mapping: Record<TileType, Record<Direction, Direction[]>> = {
+  ".": {
+    left: ["left"],
+    right: ["right"],
+    up: ["up"],
+    down: ["down"],
+  },
+  "/": {
+    left: ["down"],
+    right: ["up"],
+    up: ["right"],
+    down: ["left"],
+  },
+  "\\": {
+    left: ["up"],
+    right: ["down"],
+    up: ["left"],
+    down: ["right"],
+  },
+  "|": {
+    left: ["up", "down"],
+    right: ["up", "down"],
+    up: ["up"],
+    down: ["down"],
+  },
+  "-": {
+    left: ["left"],
+    right: ["right"],
+    up: ["left", "right"],
+    down: ["left", "right"],
+  },
+};
 
 class Tile {
-  isExploredFrom: Record<Direction, boolean> = {
+  isTravelFrom: Record<Direction, boolean> = {
     left: false,
     right: false,
     up: false,
@@ -10,7 +42,7 @@ class Tile {
   };
 
   get isExplored(): boolean {
-    return Object.values(this.isExploredFrom).some(Boolean);
+    return Object.values(this.isTravelFrom).some(Boolean);
   }
 
   constructor(
@@ -20,98 +52,68 @@ class Tile {
   ) {}
 
   getNextDirection(source: Direction): Direction[] {
-    const mapping: Record<TileType, Record<Direction, Direction[]>> = {
-      ".": {
-        left: ["left"],
-        right: ["right"],
-        up: ["up"],
-        down: ["down"],
-      },
-      "/": {
-        left: ["down"],
-        right: ["up"],
-        up: ["right"],
-        down: ["left"],
-      },
-      "\\": {
-        left: ["up"],
-        right: ["down"],
-        up: ["left"],
-        down: ["right"],
-      },
-      "|": {
-        left: ["up", "down"],
-        right: ["up", "down"],
-        up: ["up"],
-        down: ["down"],
-      },
-      "-": {
-        left: ["left"],
-        right: ["right"],
-        up: ["left", "right"],
-        down: ["left", "right"],
-      },
-    };
     return mapping[this.value][source];
   }
 
   resetMarking() {
-    this.isExploredFrom = {
-      left: false,
-      right: false,
-      up: false,
-      down: false,
-    };
+    Object.keys(this.isTravelFrom).forEach((key) => {
+      this.isTravelFrom[key as Direction] = false;
+    });
   }
 }
 
 class Graph {
   constructor(readonly tiles: Tile[][]) {}
 
-  getNumberFromTopRight() {
-    return this.getNumber(0, 0, "right");
+  countTopLeftTravel() {
+    return this.countTravel(0, 0, "right");
   }
 
-  getBestStart() {
+  countBestTravel() {
     let max = 0;
     for (let i = 0; i < this.tiles.length; i++) {
-      max = Math.max(this.getNumber(i, 0, "right"), max);
-      max = Math.max(this.getNumber(i, -1, "left"), max);
+      max = Math.max(this.countTravel(i, 0, "right"), max);
+      max = Math.max(this.countTravel(i, -1, "left"), max);
     }
     for (let i = 0; i < this.tiles[0].length; i++) {
-      max = Math.max(this.getNumber(0, i, "down"), max);
-      max = Math.max(this.getNumber(-1, i, "up"), max);
+      max = Math.max(this.countTravel(0, i, "down"), max);
+      max = Math.max(this.countTravel(-1, i, "up"), max);
     }
     return max;
   }
 
-  getNumber(x: number, y: number, dir: Direction) {
+  countTravel(x: number, y: number, dir: Direction) {
     this.tiles.flat().forEach((t) => t.resetMarking());
-    this.travel(x, y, dir);
+    const source = this.tiles.at(x)?.at(y);
+    if (!source) throw Error("Tile not found");
+    this.markTravel(source, dir);
     return this.tiles.flat().filter((v) => v.isExplored).length;
   }
 
-  travel(x: number, y: number, direction: Direction) {
-    const queue = [{ tile: this.tiles.at(x)!.at(y)!, direction: direction }];
-    let current = queue.shift();
+  getNeighbor(x: number, y: number, direction: Direction): Tile | undefined {
+    if (direction === "left") {
+      y--;
+    } else if (direction === "right") {
+      y++;
+    } else if (direction === "up") {
+      x--;
+    } else if (direction === "down") {
+      x++;
+    }
+    return this.tiles[x] ? this.tiles[x][y] : undefined;
+  }
 
+  markTravel(source: Tile, direction: Direction) {
+    const queue = [{ source: source, direction: direction }];
+    let current = queue.shift();
     while (current) {
-      const { direction, tile } = current;
-      if (!tile.isExploredFrom[direction]) {
-        tile.isExploredFrom[direction] = true;
-        tile.getNextDirection(current.direction).forEach((nextDirection) => {
-          let destination = undefined;
-          if (nextDirection === "left" && this.tiles[tile.x]) {
-            destination = this.tiles[tile.x][tile.y - 1];
-          } else if (nextDirection === "right" && this.tiles[tile.x]) {
-            destination = this.tiles[tile.x][tile.y + 1];
-          } else if (nextDirection === "up" && this.tiles[tile.x - 1]) {
-            destination = this.tiles[tile.x - 1][tile.y];
-          } else if (nextDirection === "down" && this.tiles[tile.x + 1]) {
-            destination = this.tiles[tile.x + 1][tile.y];
-          }
-          if (destination) {
-            queue.push({ tile: destination, direction: nextDirection });
+      const { direction, source } = current;
+      if (!source.isTravelFrom[direction]) {
+        source.isTravelFrom[direction] = true;
+        source.getNextDirection(current.direction).forEach((nextDirection) => {
+          const neighbor = this.getNeighbor(source.x, source.y, nextDirection);
+          if (neighbor) {
+            queue.push({ source: neighbor, direction: nextDirection });
           }
         });
       }
@@ -129,6 +131,6 @@ export class Day16 {
         line.split("").map((value, y) => new Tile(x, y, value as TileType))
       );
     const graph = new Graph(tiles);
-    return part === "1" ? graph.getNumberFromTopRight() : graph.getBestStart();
+    return part === "1" ? graph.countTopLeftTravel() : graph.countBestTravel();
   }
 }

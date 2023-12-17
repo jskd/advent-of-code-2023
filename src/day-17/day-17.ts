@@ -28,14 +28,39 @@ class Graph {
   getNeighbor(
     x: number,
     y: number,
-    oriantation: Oriantation
+    oriantation: Oriantation,
+    ultra = false
   ): { heat: number; block: Block; oriantation: Oriantation }[] {
-    return [
-      [-1, -2, -3], // Backward
-      [1, 2, 3], //Forward
-    ].flatMap((offsets) => {
+    return (
+      ultra
+        ? [
+            [-4, -5, -6, -7, -8, -9, -10], // Backward
+            [4, 5, 6, 7, 8, 9, 10], //Forward
+          ]
+        : [
+            [-1, -2, -3], // Backward
+            [1, 2, 3], //Forward
+          ]
+    ).flatMap((offsets) => {
       let heat = 0;
       let block = undefined;
+      if (offsets[0] > 0) {
+        for (let i = 1; i < offsets[0]; i++) {
+          if (oriantation === "horizontal" && x + i in this.tiles) {
+            heat += this.tiles[x + i][y].value;
+          } else if (oriantation === "vertical" && y + i in this.tiles[0]) {
+            heat += this.tiles[x][y + i].value;
+          }
+        }
+      } else {
+        for (let i = -1; i > offsets[0]; i--) {
+          if (oriantation === "horizontal" && x + i in this.tiles) {
+            heat += this.tiles[x + i][y].value;
+          } else if (oriantation === "vertical" && y + i in this.tiles[0]) {
+            heat += this.tiles[x][y + i].value;
+          }
+        }
+      }
       return offsets.flatMap((offset) => {
         if (oriantation === "horizontal" && x + offset in this.tiles) {
           block = this.tiles[x + offset][y]; // Move verticaly
@@ -76,7 +101,7 @@ class Graph {
     return min;
   }
 
-  markPath(x: number, y: number) {
+  markPath(x: number, y: number, ultra = false) {
     const source = this.tiles.at(x)?.at(y);
     if (!source) throw "source not found";
 
@@ -94,7 +119,8 @@ class Graph {
       this.getNeighbor(
         current.block.x,
         current.block.y,
-        current.oriantation
+        current.oriantation,
+        ultra
       ).forEach(({ heat, oriantation, block }) => {
         if (heat < block.heatOn[oriantation]) {
           block.heatOn[oriantation] = heat;
@@ -122,5 +148,18 @@ export class Day16 {
       );
     const graph = new Graph(tiles);
     return graph.markPath(0, 0);
+  }
+}
+
+export class Day16Part2 {
+  static solve(input: string): number {
+    const tiles = input
+      .split(/[\r\n]+/)
+      .filter(Boolean)
+      .map((line, x) =>
+        line.split("").map((value, y) => new Block(x, y, +value))
+      );
+    const graph = new Graph(tiles);
+    return graph.markPath(0, 0, true);
   }
 }

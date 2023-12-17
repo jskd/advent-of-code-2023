@@ -82,12 +82,12 @@ class Graph {
     return max;
   }
 
-  countTravel(x: number, y: number, dir: Direction) {
-    this.tiles.flat().forEach((t) => t.resetMarking());
+  countTravel(x: number, y: number, direction: Direction) {
+    this.tiles.flat().forEach((tile) => tile.resetMarking());
     const source = this.tiles.at(x)?.at(y);
-    if (!source) throw Error("Tile not found");
-    this.markTravel(source, dir);
-    return this.tiles.flat().filter((v) => v.isTravel).length;
+    if (!source) throw Error("Source tile not found");
+    this.markTravel(source, direction);
+    return this.tiles.flat().filter((tile) => tile.isTravel).length;
   }
 
   getNeighbor(x: number, y: number, direction: Direction): Tile | undefined {

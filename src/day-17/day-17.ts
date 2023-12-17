@@ -23,16 +23,18 @@ class Block {
 }
 
 class Graph {
-  constructor(readonly tiles: Block[][]) {}
+  constructor(
+    readonly tiles: Block[][],
+    readonly ultra = false
+  ) {}
 
   getNeighbor(
     x: number,
     y: number,
-    oriantation: Oriantation,
-    ultra = false
+    oriantation: Oriantation
   ): { heat: number; block: Block; oriantation: Oriantation }[] {
     return (
-      ultra
+      this.ultra
         ? [
             [-4, -5, -6, -7, -8, -9, -10], // Backward
             [4, 5, 6, 7, 8, 9, 10], //Forward
@@ -70,6 +72,9 @@ class Graph {
           return [];
         }
         heat += block.value;
+        if (block.visitedOn[togleOriantation(oriantation)]) {
+          return [];
+        }
         return [
           {
             heat: this.tiles[x][y].heatOn[oriantation] + heat,
@@ -82,18 +87,29 @@ class Graph {
   }
 
   getMinMin(): { oriantation: Oriantation; block: Block } | undefined {
-    let min: { oriantation: Oriantation; block: Block } | undefined;
-    for (const tile of this.tiles.flat()) {
+    const tiles = this.tiles
+      .flat()
+      .filter(({ visitedOn }) => !visitedOn.horizontal || !visitedOn.vertical);
+    if (tiles.length === 0) {
+      return undefined;
+    }
+
+    let min = {
+      oriantation: (tiles[0].visitedOn.horizontal
+        ? "vertical"
+        : "horizontal") as Oriantation,
+      block: tiles[0],
+    };
+    for (const tile of tiles) {
       if (
         !tile.visitedOn.horizontal &&
-        (!min || tile.heatOn.horizontal < min.block.heatOn[min.oriantation])
+        tile.heatOn.horizontal < min.block.heatOn[min.oriantation]
       ) {
         min = { oriantation: "horizontal" as Oriantation, block: tile };
       }
-
       if (
         !tile.visitedOn.vertical &&
-        (!min || tile.heatOn.vertical < min.block.heatOn[min.oriantation])
+        tile.heatOn.vertical < min.block.heatOn[min.oriantation]
       ) {
         min = { oriantation: "vertical" as Oriantation, block: tile };
       }
@@ -101,7 +117,7 @@ class Graph {
     return min;
   }
 
-  markPath(x: number, y: number, ultra = false) {
+  markPath(x: number, y: number) {
     const source = this.tiles.at(x)?.at(y);
     if (!source) throw "source not found";
 
@@ -119,8 +135,7 @@ class Graph {
       this.getNeighbor(
         current.block.x,
         current.block.y,
-        current.oriantation,
-        ultra
+        current.oriantation
       ).forEach(({ heat, oriantation, block }) => {
         if (heat < block.heatOn[oriantation]) {
           block.heatOn[oriantation] = heat;
@@ -138,28 +153,15 @@ class Graph {
   }
 }
 
-export class Day16 {
-  static solve(input: string): number {
+export class Day17 {
+  static solve(input: string, ultra = false): number {
     const tiles = input
       .split(/[\r\n]+/)
       .filter(Boolean)
       .map((line, x) =>
         line.split("").map((value, y) => new Block(x, y, +value))
       );
-    const graph = new Graph(tiles);
+    const graph = new Graph(tiles, ultra);
     return graph.markPath(0, 0);
-  }
-}
-
-export class Day16Part2 {
-  static solve(input: string): number {
-    const tiles = input
-      .split(/[\r\n]+/)
-      .filter(Boolean)
-      .map((line, x) =>
-        line.split("").map((value, y) => new Block(x, y, +value))
-      );
-    const graph = new Graph(tiles);
-    return graph.markPath(0, 0, true);
   }
 }

@@ -29,12 +29,12 @@ describe("Day 5", function () {
     "humidity-to-location map:\r\n" +
     "60 56 37\r\n" +
     "56 93 4";
-  it("Solve day 5 part 1 exemple", function () {
+  it("Solve day 5 part 2 exemple", () => {
     expect(Day05Part2.solve(example)).toBe(46);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-05-input.txt`).toString();
-  it("Solve day 5 part 1 puzzle", function () {
+  it("Solve day 5 part 2 puzzle", () => {
     expect(Day05Part2.solve(puzzle)).toBe(50855035);
   });
 });

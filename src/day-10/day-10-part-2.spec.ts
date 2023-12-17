@@ -1,8 +1,8 @@
 import { Day10Part2 } from "./day-10-part-2";
 import fs from "fs";
 
-describe("Day 10", function () {
-  it("Solve day 10 part 2 exemple 1", function () {
+describe("Day 10", () => {
+  it("Solve day 10 part 2 exemple 1", () => {
     const example =
       "...........\r\n" +
       ".S-------7.\r\n" +
@@ -16,7 +16,7 @@ describe("Day 10", function () {
     expect(Day10Part2.solve(example)).toBe(4);
   });
 
-  it("Solve day 10 part 2 exemple 2", function () {
+  it("Solve day 10 part 2 exemple 2", () => {
     const example =
       ".F----7F7F7F7F-7....\r\n" +
       ".|F--7||||||||FJ....\r\n" +
@@ -31,7 +31,7 @@ describe("Day 10", function () {
     expect(Day10Part2.solve(example)).toBe(8);
   });
 
-  it("Solve day 10 part 2 exemple 2", function () {
+  it("Solve day 10 part 2 exemple 3", () => {
     const example =
       "FF7FSF7F7F7F7F7F---7\r\n" +
       "L|LJ||||||||||||F--J\r\n" +
@@ -46,7 +46,7 @@ describe("Day 10", function () {
     expect(Day10Part2.solve(example)).toBe(10);
   });
 
-  it("Solve day 10 part 2 puzzle", function () {
+  it("Solve day 10 part 2 puzzle", () => {
     const puzzle = fs.readFileSync(`${__dirname}/day-10-input.txt`);
     expect(Day10Part2.solve(puzzle.toString())).toBe(529);
   });

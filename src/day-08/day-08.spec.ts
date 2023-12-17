@@ -1,15 +1,15 @@
 import { Day8Part1, Day8Part2, Node } from "./day-08";
 import fs from "fs";
 
-describe("Day 8", function () {
-  it("Parse node", function () {
+describe("Day 8", () => {
+  it("Parse node", () => {
     const node = new Node("AAA = (BBB, CCC)");
     expect(node.left).toBe("BBB");
     expect(node.right).toBe("CCC");
     expect(node.value).toBe("AAA");
   });
 
-  it("Solve Day 8 part 1 exemple 1", function () {
+  it("Solve Day 8 part 1 exemple 1", () => {
     const example =
       "RL\r\n" +
       "AAA = (BBB, CCC)\r\n" +
@@ -22,7 +22,7 @@ describe("Day 8", function () {
     expect(Day8Part1.solve(example)).toBe(2);
   });
 
-  it("Solve Day 8 part 1 exemple 2", function () {
+  it("Solve Day 8 part 1 exemple 2", () => {
     const example =
       "LLR\r\n" +
       "AAA = (BBB, BBB)\r\n" +
@@ -31,7 +31,7 @@ describe("Day 8", function () {
     expect(Day8Part1.solve(example)).toBe(6);
   });
 
-  it("Solve Day 8 part 2 exemple 1", function () {
+  it("Solve Day 8 part 2 exemple", () => {
     const example =
       "LR\r\n" +
       "11A = (11B, XXX)\r\n" +
@@ -46,11 +46,10 @@ describe("Day 8", function () {
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-08-input.txt`);
-  it("Solve Day 8 part 1 puzzle", function () {
+  it("Solve Day 8 part 1 puzzle", () => {
     expect(Day8Part1.solve(puzzle.toString())).toBe(18827);
   });
-
-  it("Solve Day 8 part 2 puzzle", function () {
+  it("Solve Day 8 part 2 puzzle", () => {
     expect(Day8Part2.solve(puzzle.toString())).toBe(20220305520997);
   });
 });

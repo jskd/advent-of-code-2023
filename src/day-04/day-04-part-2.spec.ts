@@ -1,7 +1,7 @@
 import { Card, Day04Part2 } from "./day-04-part-2";
 import fs from "fs";
 
-describe("Day 4 part 2", function () {
+describe("Day 4 part 2", () => {
   const examples = [
     "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
     "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19",
@@ -11,7 +11,7 @@ describe("Day 4 part 2", function () {
     "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11",
   ];
 
-  it("Get matching numbers of card", function () {
+  it("Get matching numbers of card", () => {
     expect(new Card(examples[0]).matchingNumbers).toStrictEqual(4);
     expect(new Card(examples[1]).matchingNumbers).toStrictEqual(2);
     expect(new Card(examples[2]).matchingNumbers).toStrictEqual(2);
@@ -20,11 +20,11 @@ describe("Day 4 part 2", function () {
     expect(new Card(examples[5]).matchingNumbers).toStrictEqual(0);
   });
 
-  it("Solve example", function () {
+  it("Solve day 4 part 2 exemple", () => {
     expect(Day04Part2.solve(examples.join("\r\n"))).toStrictEqual(30);
   });
 
-  it("Solve day 4 part 2", function () {
+  it("Solve day 4 part 2 puzzle", () => {
     const content = fs.readFileSync(`${__dirname}/day-04-input.txt`);
     expect(Day04Part2.solve(content.toString())).toBe(7013204);
   });

@@ -1,7 +1,7 @@
 import { Day03Part1, NumberPos } from "./day-03-part-1";
 import fs from "fs";
 
-describe("Day 3 part 1", function () {
+describe("Day 3 part 1", () => {
   const example = [
     "467..114..",
     "...*......",
@@ -16,11 +16,11 @@ describe("Day 3 part 1", function () {
   ];
   const symbols = [[], [3], [], [6], [3], [5], [], [], [3, 5], []];
 
-  it("Find symbols position", function () {
+  it("Find symbols position", () => {
     expect(Day03Part1.findSymbolPos(example)).toStrictEqual(symbols);
   });
 
-  it("Find numbers position", function () {
+  it("Find numbers position", () => {
     expect(Day03Part1.getNumberPos(example)).toStrictEqual([
       new NumberPos(0, 0, "467"),
       new NumberPos(0, 5, "114"),
@@ -68,12 +68,12 @@ describe("Day 3 part 1", function () {
     );
   });
 
-  it("Solve example", function () {
+  it("Solve day 3 part 1 exemple", () => {
     expect(Day03Part1.solve(example.join("\r\n"))).toBe(4361);
   });
 
-  it("Solve day 3 part 1", function () {
-    const content = fs.readFileSync(`${__dirname}/day-03-input.txt`);
-    expect(Day03Part1.solve(content.toString())).toBe(540131);
+  it("Solve day 3 part 1 exemple", () => {
+    const puzzle = fs.readFileSync(`${__dirname}/day-03-input.txt`).toString();
+    expect(Day03Part1.solve(puzzle)).toBe(540131);
   });
 });

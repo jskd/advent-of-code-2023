@@ -1,7 +1,7 @@
 import { Day03Part2, GearPos } from "./day-03-part-2";
 import fs from "fs";
 
-describe("Day 3 part 2", function () {
+describe("Day 3 part 2", () => {
   const example = [
     "467..114..",
     "...*......",
@@ -54,31 +54,31 @@ describe("Day 3 part 2", function () {
     [],
   ];
 
-  it("Find gear position", function () {
+  it("Find gear position", () => {
     expect(Day03Part2.findGearPosition(example)).toStrictEqual(gears);
   });
 
-  it("Associate number adjacent to gear", function () {
+  it("Associate number adjacent to gear", () => {
     numbers.forEach((pos) => Day03Part2.associateGearAdjacent(pos, gears));
     expect(gears).toStrictEqual(associatedGears);
   });
 
-  it("Calculate gear ratio", function () {
+  it("Calculate gear ratio", () => {
     expect(associatedGear1.getRatio()).toBe(16345);
     expect(associatedGear2.getRatio()).toBe(0);
     expect(associatedGear3.getRatio()).toBe(451490);
   });
 
-  it("Calculate sum of gear ratio", function () {
+  it("Calculate sum of gear ratio", () => {
     expect(Day03Part2.getSumGearRatio(associatedGears)).toBe(467835);
   });
 
-  it("Solve example", function () {
+  it("Solve day 3 part 2 exemple", () => {
     expect(Day03Part2.solve(example.join("\r\n"))).toBe(467835);
   });
 
-  it("Solve day 3 part 2", function () {
-    const content = fs.readFileSync(`${__dirname}/day-03-input.txt`);
-    expect(Day03Part2.solve(content.toString())).toBe(86879020);
+  it("Solve day 3 part 2 puzzle", () => {
+    const puzzle = fs.readFileSync(`${__dirname}/day-03-input.txt`).toString();
+    expect(Day03Part2.solve(puzzle)).toBe(86879020);
   });
 });

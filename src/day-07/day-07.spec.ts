@@ -1,7 +1,7 @@
 import { Day7, Hand, Hands } from "./day-07";
 import fs from "fs";
 
-fdescribe("Day 7", function () {
+fdescribe("Day 7", () => {
   test.each([
     ["Q2TJK", 0x11],
     ["32T3K", 0x21],
@@ -34,7 +34,7 @@ fdescribe("Day 7", function () {
     )
   );
 
-  it("Sort by strength without joker", function () {
+  it("Sort by strength without joker", () => {
     expect(
       new Hands(
         new Hand("444J3", 365, false),
@@ -48,7 +48,7 @@ fdescribe("Day 7", function () {
     ).toStrictEqual(["Q2TJK", "32T3K", "444J3", "J58JJ", "JKKJJ"]);
   });
 
-  it("Get total bid without joker", function () {
+  it("Get total bid without joker", () => {
     expect(
       new Hands(
         new Hand("444J3", 365, false),
@@ -96,7 +96,7 @@ fdescribe("Day 7", function () {
     )
   );
 
-  it("Sort by strength with joker", function () {
+  it("Sort by strength with joker", () => {
     expect(
       new Hands(
         new Hand("444J3", 365, true),
@@ -110,7 +110,7 @@ fdescribe("Day 7", function () {
     ).toStrictEqual(["32T3K", "Q2TJK", "J58JJ", "444J3", "JKKJJ"]);
   });
 
-  it("Get total bid without joker", function () {
+  it("Get total bid without joker", () => {
     expect(
       new Hands(
         new Hand("444J3", 365, true),
@@ -128,18 +128,18 @@ fdescribe("Day 7", function () {
                     "KK677 28\r\n" + 
                     "KTJJT 220\r\n" + 
                     "QQQJA 483";
-  it("Solve Day 7 part 1 example", function () {
+  it("Solve Day 7 part 1 example", () => {
     expect(Day7.solve(example, false)).toBe(6440);
   });
-  it("Solve Day 7 part 2 example", function () {
+  it("Solve Day 7 part 2 example", () => {
     expect(Day7.solve(example, true)).toBe(5905);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-07-input.txt`);
-  it("Solve Day 7 part 1 puzzle", function () {
+  it("Solve Day 7 part 1 puzzle", () => {
     expect(Day7.solve(puzzle.toString(), false)).toBe(253638586);
   });
-  it("Solve Day 7 part 2 puzzle", function () {
+  it("Solve Day 7 part 2 puzzle", () => {
     expect(Day7.solve(puzzle.toString(), true)).toBe(253253225);
   });
 });

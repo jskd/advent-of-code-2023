@@ -1,8 +1,8 @@
 import fs from "fs";
 import { Day01Part2 } from "./day-01-part-2";
 
-describe("Day 1 part 2", function () {
-  it("Get first digit value", function () {
+describe("Day 1 part 2", () => {
+  it("Get first digit value", () => {
     expect(Day01Part2.getFirstDigit("two1nine", "leftToRight")).toBe(2);
     expect(Day01Part2.getFirstDigit("eightwothree", "leftToRight")).toBe(8);
     expect(Day01Part2.getFirstDigit("abcone2threexyz", "leftToRight")).toBe(1);
@@ -13,7 +13,7 @@ describe("Day 1 part 2", function () {
     expect(Day01Part2.getFirstDigit("five61oneightr", "leftToRight")).toBe(5);
   });
 
-  it("Get last digit value", function () {
+  it("Get last digit value", () => {
     expect(Day01Part2.getFirstDigit("two1nine", "rightToLeft")).toBe(9);
     expect(Day01Part2.getFirstDigit("eightwothree", "rightToLeft")).toBe(3);
     expect(Day01Part2.getFirstDigit("abcone2threexyz", "rightToLeft")).toBe(3);
@@ -24,7 +24,7 @@ describe("Day 1 part 2", function () {
     expect(Day01Part2.getFirstDigit("five61oneightr", "rightToLeft")).toBe(8);
   });
 
-  it("Evaluate simple line", function () {
+  it("Evaluate simple line", () => {
     expect(Day01Part2.solve("two1nine")).toBe(29);
     expect(Day01Part2.solve("eightwothree")).toBe(83);
     expect(Day01Part2.solve("abcone2threexyz")).toBe(13);
@@ -34,11 +34,11 @@ describe("Day 1 part 2", function () {
     expect(Day01Part2.solve("7pqrstsixteen")).toBe(76);
   });
 
-  it("Evaluate mixed literal line", function () {
+  it("Evaluate mixed literal line", () => {
     expect(Day01Part2.solve("five61oneightr")).toBe(58);
   });
 
-  it("Solve full example", function () {
+  it("Solve day 1 part 2 exemple", () => {
     const example =
       "two1nine\r\n" +
       "eightwothree\r\n" +
@@ -50,8 +50,8 @@ describe("Day 1 part 2", function () {
     expect(Day01Part2.solve(example)).toBe(281);
   });
 
-  it("Solve day 1 part 2", function () {
-    const content = fs.readFileSync(`${__dirname}/day-01-input.txt`);
-    expect(Day01Part2.solve(content.toString())).toBe(55614);
+  it("Solve day 1 part 2", () => {
+    const puzzle = fs.readFileSync(`${__dirname}/day-01-input.txt`).toString();
+    expect(Day01Part2.solve(puzzle)).toBe(55614);
   });
 });

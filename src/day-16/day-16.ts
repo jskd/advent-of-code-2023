@@ -71,13 +71,13 @@ class Graph {
 
   countBestTravel() {
     let max = 0;
-    for (let i = 0; i < this.tiles.length; i++) {
-      max = Math.max(this.countTravel(i, 0, "right"), max);
-      max = Math.max(this.countTravel(i, -1, "left"), max);
+    for (let x = 0; x < this.tiles.length; x++) {
+      max = Math.max(this.countTravel(x, 0, "right"), max);
+      max = Math.max(this.countTravel(x, -1, "left"), max);
     }
-    for (let i = 0; i < this.tiles[0].length; i++) {
-      max = Math.max(this.countTravel(0, i, "down"), max);
-      max = Math.max(this.countTravel(-1, i, "up"), max);
+    for (let y = 0; y < this.tiles[0].length; y++) {
+      max = Math.max(this.countTravel(0, y, "down"), max);
+      max = Math.max(this.countTravel(-1, y, "up"), max);
     }
     return max;
   }

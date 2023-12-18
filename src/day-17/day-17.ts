@@ -6,6 +6,18 @@ function toggleDirection(direction: Direction) {
   return direction === "horizontal" ? "vertical" : "horizontal";
 }
 
+function spliceMinimum(queue: QueueEntry[]): QueueEntry | undefined {
+  let minIndex = 0;
+  let minHeat = Number.MAX_SAFE_INTEGER;
+  queue.forEach(({ direction, block }, index) => {
+    if (block.heatOn[direction] < minHeat) {
+      minHeat = block.heatOn[direction];
+      minIndex = index;
+    }
+  });
+  return queue.splice(minIndex, 1)[0];
+}
+
 class Block {
   visitedOn = { vertical: false, horizontal: false };
   heatOn: Record<Direction, number> = {
@@ -21,8 +33,6 @@ class Block {
 }
 
 class Graph {
-  readonly queue: QueueEntry[] = [];
-
   constructor(
     readonly blocks: Block[][],
     readonly part: "1" | "2" = "1"
@@ -72,43 +82,28 @@ class Graph {
     ];
   }
 
-  getMinimum(): QueueEntry | undefined {
-    if (!this.queue) {
-      return undefined;
-    }
-    let minIndex = 0;
-    let minHeat = Number.MAX_SAFE_INTEGER;
-    this.queue.forEach(({ direction, block }, index) => {
-      if (block.heatOn[direction] < minHeat) {
-        minIndex = index;
-        minHeat = block.heatOn[direction];
-      }
-    });
-    const [minimum] = this.queue.splice(minIndex, 1);
-    return minimum;
-  }
-
-  getShortestPaths() {
+  getShortestPaths(): number {
     const target = this.blocks.at(-1)!.at(-1)!;
     this.blocks[0][0].heatOn = { horizontal: 0, vertical: 0 };
-    this.queue.push(
+    const queue: QueueEntry[] = [];
+    queue.push(
       { direction: "vertical", block: this.blocks[0][0] },
       { direction: "horizontal", block: this.blocks[0][0] }
     );
-    let current = this.queue.shift();
+    let current = queue.shift();
     while (current && current.block !== target) {
       this.getAllNeighbors(current.block, current.direction).forEach(
         ({ heat, direction, block }) => {
           if (heat < block.heatOn[direction]) {
             if (block.heatOn[direction] === Number.MAX_SAFE_INTEGER) {
-              this.queue.push({ direction: direction, block: block });
+              queue.push({ direction: direction, block: block });
             }
             block.heatOn[direction] = heat;
           }
         }
       );
       current.block.visitedOn[current.direction] = true;
-      current = this.getMinimum();
+      current = spliceMinimum(queue);
     }
     const { horizontal, vertical } = target.heatOn;
     return Math.min(horizontal, vertical);

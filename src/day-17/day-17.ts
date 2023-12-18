@@ -4,13 +4,10 @@ function toggleDirection(oriantation: Direction) {
 }
 
 class Block {
+  visitedOn = { vertical: false, horizontal: false };
   heatOn: Record<Direction, number> = {
     vertical: Number.MAX_SAFE_INTEGER,
     horizontal: Number.MAX_SAFE_INTEGER,
-  };
-  visitedOn = {
-    vertical: false,
-    horizontal: false,
   };
 
   constructor(
@@ -43,14 +40,14 @@ class Graph {
             [1, 2, 3], //Forward
           ]
     ).flatMap((offsets) => {
-      let heat = 0;
-      // Initial value of heat for part 2
+      let travelHeat = 0;
+      // Initial value of travel heat for part 2
       for (let i = 1; i < Math.abs(offsets[0]); i++) {
         const index = offsets[0] > 0 ? i : i * -1;
         if (direction === "horizontal" && x + index in this.tiles) {
-          heat += this.tiles[x + index][y].value;
+          travelHeat += this.tiles[x + index][y].value;
         } else if (direction === "vertical" && y + index in this.tiles[0]) {
-          heat += this.tiles[x][y + index].value;
+          travelHeat += this.tiles[x][y + index].value;
         }
       }
       return offsets.flatMap((offset) => {
@@ -62,10 +59,10 @@ class Graph {
         } else {
           return [];
         }
-        heat += block.value;
+        travelHeat += block.value;
         return [
           {
-            heat: this.tiles[x][y].heatOn[direction] + heat,
+            heat: travelHeat + this.tiles[x][y].heatOn[direction],
             block: block,
             direction: toggleDirection(direction),
           },

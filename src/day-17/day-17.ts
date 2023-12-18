@@ -2,8 +2,8 @@ type Direction = "vertical" | "horizontal";
 type QueueEntry = { block: Block; direction: Direction };
 type NeighborEntry = QueueEntry & { heat: number };
 
-function toggleDirection(oriantation: Direction) {
-  return oriantation === "horizontal" ? "vertical" : "horizontal";
+function toggleDirection(direction: Direction) {
+  return direction === "horizontal" ? "vertical" : "horizontal";
 }
 
 class Block {
@@ -47,15 +47,16 @@ class Graph {
         break;
       }
       const neighbor = this.blocks[x + offsetX][y + offsetY];
+      const nextDirection = toggleDirection(direction);
       heat += neighbor.value;
       if (
-        !neighbor.visitedOn[direction] &&
+        !neighbor.visitedOn[nextDirection] &&
         (Math.abs(offsetX) > minNeighbor || Math.abs(offsetY) > minNeighbor)
       ) {
         result.push({
           heat: heat,
           block: neighbor,
-          direction: toggleDirection(direction),
+          direction: nextDirection,
         });
       }
       offsetX += incrementX;

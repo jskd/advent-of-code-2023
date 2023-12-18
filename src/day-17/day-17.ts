@@ -27,16 +27,15 @@ class Graph {
 
   constructor(
     readonly tiles: Block[][],
-    readonly ultra = false
+    readonly part: "1" | "2" = "1"
   ) {}
 
   getNeighbor(
-    x: number,
-    y: number,
+    { x, y }: Block,
     oriantation: Oriantation
   ): { heat: number; block: Block; oriantation: Oriantation }[] {
     return (
-      this.ultra
+      this.part === "2"
         ? [
             [-4, -5, -6, -7, -8, -9, -10], // Backward
             [4, 5, 6, 7, 8, 9, 10], //Forward
@@ -113,18 +112,16 @@ class Graph {
     this.initQueue();
     let current = this.queue.shift();
     while (current) {
-      this.getNeighbor(
-        current.block.x,
-        current.block.y,
-        current.oriantation
-      ).forEach(({ heat, oriantation, block }) => {
-        if (heat < block.heatOn[oriantation]) {
-          if (block.heatOn[oriantation] === Number.MAX_SAFE_INTEGER) {
-            this.queue.push({ oriantation: oriantation, block: block });
+      this.getNeighbor(current.block, current.oriantation).forEach(
+        ({ heat, oriantation, block }) => {
+          if (heat < block.heatOn[oriantation]) {
+            if (block.heatOn[oriantation] === Number.MAX_SAFE_INTEGER) {
+              this.queue.push({ oriantation: oriantation, block: block });
+            }
+            block.heatOn[oriantation] = heat;
           }
-          block.heatOn[oriantation] = heat;
         }
-      });
+      );
       current.block.visitedOn[current.oriantation] = true;
       current = this.getMin();
     }
@@ -134,14 +131,14 @@ class Graph {
 }
 
 export class Day17 {
-  static solve(input: string, ultra = false): number {
+  static solve(input: string, part: "1" | "2"): number {
     const tiles = input
       .split(/[\r\n]+/)
       .filter(Boolean)
       .map((line, x) =>
         line.split("").map((value, y) => new Block(x, y, +value))
       );
-    const graph = new Graph(tiles, ultra);
+    const graph = new Graph(tiles, part);
     return graph.getShortestPaths();
   }
 }

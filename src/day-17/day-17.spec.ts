@@ -17,17 +17,17 @@ describe("Day 17", () => {
     "2546548887735\r\n" +
     "4322674655533";
   it("Solve day 17 part 1 exemple", () => {
-    expect(Day17.solve(example)).toBe(102);
+    expect(Day17.solve(example, "1")).toBe(102);
   });
   it("Solve day 17 part 2 exemple", () => {
-    expect(Day17.solve(example, true)).toBe(94);
+    expect(Day17.solve(example, "2")).toBe(94);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-17-input.txt`).toString();
   it("Solve day 17 part 1 puzzle", () => {
-    expect(Day17.solve(puzzle)).toBe(817);
+    expect(Day17.solve(puzzle, "1")).toBe(817);
   });
   it("Solve day 17 part 2 puzzle", () => {
-    expect(Day17.solve(puzzle, true)).toBe(925);
+    expect(Day17.solve(puzzle, "2")).toBe(925);
   });
 });

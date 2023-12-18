@@ -1,4 +1,7 @@
 type Direction = "vertical" | "horizontal";
+type QueueEntry = { block: Block; direction: Direction };
+type NeighborEntry = QueueEntry & { heat: number };
+
 function toggleDirection(oriantation: Direction) {
   return oriantation === "horizontal" ? "vertical" : "horizontal";
 }
@@ -18,73 +21,57 @@ class Block {
 }
 
 class Graph {
-  queue: { direction: Direction; block: Block }[] = [];
+  readonly queue: QueueEntry[] = [];
 
   constructor(
-    readonly tiles: Block[][],
+    readonly blocks: Block[][],
     readonly part: "1" | "2" = "1"
   ) {}
 
-  getNeighbor(
-    { x, y }: Block,
-    direction: Direction
-  ): { heat: number; block: Block; direction: Direction }[] {
-    return (
-      this.part === "2"
-        ? [
-            [-4, -5, -6, -7, -8, -9, -10], // Backward
-            [4, 5, 6, 7, 8, 9, 10], //Forward
-          ]
-        : [
-            [-1, -2, -3], // Backward
-            [1, 2, 3], //Forward
-          ]
-    ).flatMap((offsets) => {
-      let travelHeat = 0;
-      // Initial value of travel heat for part 2
-      for (let i = 1; i < Math.abs(offsets[0]); i++) {
-        const index = offsets[0] > 0 ? i : i * -1;
-        if (direction === "horizontal" && x + index in this.tiles) {
-          travelHeat += this.tiles[x + index][y].value;
-        } else if (direction === "vertical" && y + index in this.tiles[0]) {
-          travelHeat += this.tiles[x][y + index].value;
-        }
+  getNeighborsOneDirection(
+    block: Block,
+    direction: Direction,
+    backward: boolean
+  ): NeighborEntry[] {
+    const result: NeighborEntry[] = [];
+    const minNeighbor = this.part === "1" ? 1 : 4;
+    const maxNeighbor = this.part === "1" ? 4 : 11;
+    const incrementX = direction === "horizontal" ? (backward ? -1 : 1) : 0;
+    const incrementY = direction === "vertical" ? (backward ? -1 : 1) : 0;
+    const { x, y } = block;
+    let heat = block.heatOn[direction];
+    let offsetX = incrementX;
+    let offsetY = incrementY;
+    while (Math.abs(offsetX) < maxNeighbor && Math.abs(offsetY) < maxNeighbor) {
+      if (!(x + offsetX in this.blocks) || !(y + offsetY in this.blocks[x])) {
+        break;
       }
-      return offsets.flatMap((offset) => {
-        let block = undefined;
-        if (direction === "horizontal" && x + offset in this.tiles) {
-          block = this.tiles[x + offset][y]; // Move verticaly
-        } else if (direction === "vertical" && y + offset in this.tiles[0]) {
-          block = this.tiles[x][y + offset]; // Move horizontaly
-        } else {
-          return [];
-        }
-        travelHeat += block.value;
-        return [
-          {
-            heat: travelHeat + this.tiles[x][y].heatOn[direction],
-            block: block,
-            direction: toggleDirection(direction),
-          },
-        ];
-      });
-    });
+      const neighbor = this.blocks[x + offsetX][y + offsetY];
+      heat += neighbor.value;
+      if (
+        !neighbor.visitedOn[direction] &&
+        (Math.abs(offsetX) >= minNeighbor || Math.abs(offsetY) >= minNeighbor)
+      ) {
+        result.push({
+          heat: heat,
+          block: neighbor,
+          direction: toggleDirection(direction),
+        });
+      }
+      offsetX += incrementX;
+      offsetY += incrementY;
+    }
+    return result;
   }
 
-  initQueue(): void {
-    this.queue = [
-      {
-        direction: "vertical" as Direction,
-        block: this.tiles[0][0],
-      },
-      {
-        direction: "horizontal" as Direction,
-        block: this.tiles[0][0],
-      },
+  getAllNeighbors(block: Block, direction: Direction): NeighborEntry[] {
+    return [
+      ...this.getNeighborsOneDirection(block, direction, false),
+      ...this.getNeighborsOneDirection(block, direction, true),
     ];
   }
 
-  getMinimum(): { direction: Direction; block: Block } | undefined {
+  getMinimum(): QueueEntry | undefined {
     if (!this.queue.length) {
       return undefined;
     }
@@ -101,11 +88,15 @@ class Graph {
   }
 
   getShortestPaths() {
-    this.tiles[0][0].heatOn = { horizontal: 0, vertical: 0 };
-    this.initQueue();
+    const target = this.blocks.at(-1)!.at(-1)!;
+    this.blocks[0][0].heatOn = { horizontal: 0, vertical: 0 };
+    this.queue.push(
+      { direction: "vertical", block: this.blocks[0][0] },
+      { direction: "horizontal", block: this.blocks[0][0] }
+    );
     let current = this.queue.shift();
-    while (current) {
-      this.getNeighbor(current.block, current.direction).forEach(
+    while (current && current.block !== target) {
+      this.getAllNeighbors(current.block, current.direction).forEach(
         ({ heat, direction, block }) => {
           if (heat < block.heatOn[direction]) {
             if (block.heatOn[direction] === Number.MAX_SAFE_INTEGER) {
@@ -118,8 +109,8 @@ class Graph {
       current.block.visitedOn[current.direction] = true;
       current = this.getMinimum();
     }
-    const { heatOn: target } = this.tiles.at(-1)!.at(-1)!;
-    return Math.min(target.horizontal, target.vertical);
+    const { horizontal, vertical } = target.heatOn;
+    return Math.min(horizontal, vertical);
   }
 }
 

@@ -48,6 +48,7 @@ class Graph {
     const maxNeighbor = this.part === "1" ? 4 : 11;
     const incrementX = direction === "horizontal" ? (backward ? -1 : 1) : 0;
     const incrementY = direction === "vertical" ? (backward ? -1 : 1) : 0;
+    const nextDirection = toggleDirection(direction);
     const { x, y } = block;
     let heat = block.heatOn[direction];
     let offsetX = incrementX;
@@ -57,7 +58,6 @@ class Graph {
         break;
       }
       const neighbor = this.blocks[x + offsetX][y + offsetY];
-      const nextDirection = toggleDirection(direction);
       heat += neighbor.value;
       if (
         !neighbor.visitedOn[nextDirection] &&

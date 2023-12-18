@@ -34,7 +34,7 @@ class Graph {
     backward: boolean
   ): NeighborEntry[] {
     const result: NeighborEntry[] = [];
-    const minNeighbor = this.part === "1" ? 1 : 4;
+    const minNeighbor = this.part === "1" ? 0 : 3;
     const maxNeighbor = this.part === "1" ? 4 : 11;
     const incrementX = direction === "horizontal" ? (backward ? -1 : 1) : 0;
     const incrementY = direction === "vertical" ? (backward ? -1 : 1) : 0;
@@ -50,7 +50,7 @@ class Graph {
       heat += neighbor.value;
       if (
         !neighbor.visitedOn[direction] &&
-        (Math.abs(offsetX) >= minNeighbor || Math.abs(offsetY) >= minNeighbor)
+        (Math.abs(offsetX) > minNeighbor || Math.abs(offsetY) > minNeighbor)
       ) {
         result.push({
           heat: heat,
@@ -72,7 +72,7 @@ class Graph {
   }
 
   getMinimum(): QueueEntry | undefined {
-    if (!this.queue.length) {
+    if (!this.queue) {
       return undefined;
     }
     let minIndex = 0;

@@ -23,6 +23,8 @@ class Block {
 }
 
 class Graph {
+  queue: { oriantation: Oriantation; block: Block }[] = [];
+
   constructor(
     readonly tiles: Block[][],
     readonly ultra = false
@@ -83,9 +85,8 @@ class Graph {
     });
   }
 
-  getShortestPaths() {
-    this.tiles[0][0].heatOn = { horizontal: 0, vertical: 0 };
-    const queue = this.tiles.flat().flatMap((tile) => [
+  initQueue(): void {
+    this.queue = this.tiles.flat().flatMap((tile) => [
       {
         oriantation: "vertical" as Oriantation,
         block: tile,
@@ -95,29 +96,32 @@ class Graph {
         block: tile,
       },
     ]);
+  }
 
-    const getMin = ():
-      | { oriantation: Oriantation; block: Block }
-      | undefined => {
-      if (!queue.length) {
-        return undefined;
+  getMin(): { oriantation: Oriantation; block: Block } | undefined {
+    if (!this.queue.length) {
+      return undefined;
+    }
+    let minIndex = 0;
+    let heat = this.queue[0].block.heatOn[this.queue[0].oriantation];
+
+    this.queue.forEach(({ oriantation, block }, index) => {
+      if (
+        (oriantation === "horizontal" && block.heatOn.horizontal < heat) ||
+        (oriantation === "vertical" && block.heatOn.vertical < heat)
+      ) {
+        minIndex = index;
+        heat = block.heatOn[oriantation];
       }
-      let minIndex = 0;
-      let heat = queue[0].block.heatOn[queue[0].oriantation];
+    });
+    const [min] = this.queue.splice(minIndex, 1);
+    return min;
+  }
 
-      queue.forEach(({ oriantation, block }, index) => {
-        if (
-          (oriantation === "horizontal" && block.heatOn.horizontal < heat) ||
-          (oriantation === "vertical" && block.heatOn.vertical < heat)
-        ) {
-          minIndex = index;
-          heat = block.heatOn[oriantation];
-        }
-      });
-      return queue.splice(minIndex, 1)[0];
-    };
-
-    let current = getMin();
+  getShortestPaths() {
+    this.tiles[0][0].heatOn = { horizontal: 0, vertical: 0 };
+    this.initQueue();
+    let current = this.getMin();
     while (current) {
       this.getNeighbor(
         current.block.x,
@@ -128,9 +132,8 @@ class Graph {
           block.heatOn[oriantation] = heat;
         }
       });
-
       current.block.visitedOn[current.oriantation] = true;
-      current = getMin();
+      current = this.getMin();
     }
     const { heatOn: target } = this.tiles.at(-1)!.at(-1)!;
     return Math.min(target.horizontal, target.vertical);

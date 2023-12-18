@@ -47,25 +47,16 @@ class Graph {
           ]
     ).flatMap((offsets) => {
       let heat = 0;
-      let block = undefined;
-      if (offsets[0] > 0) {
-        for (let i = 1; i < offsets[0]; i++) {
-          if (oriantation === "horizontal" && x + i in this.tiles) {
-            heat += this.tiles[x + i][y].value;
-          } else if (oriantation === "vertical" && y + i in this.tiles[0]) {
-            heat += this.tiles[x][y + i].value;
-          }
-        }
-      } else {
-        for (let i = -1; i > offsets[0]; i--) {
-          if (oriantation === "horizontal" && x + i in this.tiles) {
-            heat += this.tiles[x + i][y].value;
-          } else if (oriantation === "vertical" && y + i in this.tiles[0]) {
-            heat += this.tiles[x][y + i].value;
-          }
+      for (let i = 1; i < Math.abs(offsets[0]); i++) {
+        const index = offsets[0] > 0 ? i : i * -1;
+        if (oriantation === "horizontal" && x + index in this.tiles) {
+          heat += this.tiles[x + index][y].value;
+        } else if (oriantation === "vertical" && y + index in this.tiles[0]) {
+          heat += this.tiles[x][y + index].value;
         }
       }
       return offsets.flatMap((offset) => {
+        let block = undefined;
         if (oriantation === "horizontal" && x + offset in this.tiles) {
           block = this.tiles[x + offset][y]; // Move verticaly
         } else if (oriantation === "vertical" && y + offset in this.tiles[0]) {
@@ -86,16 +77,16 @@ class Graph {
   }
 
   initQueue(): void {
-    this.queue = this.tiles.flat().flatMap((tile) => [
+    this.queue = [
       {
         oriantation: "vertical" as Oriantation,
-        block: tile,
+        block: this.tiles[0][0],
       },
       {
         oriantation: "horizontal" as Oriantation,
-        block: tile,
+        block: this.tiles[0][0],
       },
-    ]);
+    ];
   }
 
   getMin(): { oriantation: Oriantation; block: Block } | undefined {
@@ -104,7 +95,6 @@ class Graph {
     }
     let minIndex = 0;
     let heat = this.queue[0].block.heatOn[this.queue[0].oriantation];
-
     this.queue.forEach(({ oriantation, block }, index) => {
       if (
         (oriantation === "horizontal" && block.heatOn.horizontal < heat) ||
@@ -121,7 +111,7 @@ class Graph {
   getShortestPaths() {
     this.tiles[0][0].heatOn = { horizontal: 0, vertical: 0 };
     this.initQueue();
-    let current = this.getMin();
+    let current = this.queue.shift();
     while (current) {
       this.getNeighbor(
         current.block.x,
@@ -129,6 +119,9 @@ class Graph {
         current.oriantation
       ).forEach(({ heat, oriantation, block }) => {
         if (heat < block.heatOn[oriantation]) {
+          if (block.heatOn[oriantation] === Number.MAX_SAFE_INTEGER) {
+            this.queue.push({ oriantation: oriantation, block: block });
+          }
           block.heatOn[oriantation] = heat;
         }
       });

@@ -18,11 +18,17 @@ describe("Day 18", () => {
     "L 2 (#015232)\r\n" +
     "U 2 (#7a21e3)";
   it("Solve day 18 part 1 exemple", () => {
-    expect(Day18.solve(example)).toBe(62);
+    expect(Day18.solve(example, 1)).toBe(62);
+  });
+  it("Solve day 18 part 2 exemple", () => {
+    expect(Day18.solve(example, 2)).toBe(952408144115);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-18-input.txt`).toString();
   it("Solve day 18 part 1 puzzle", () => {
-    expect(Day18.solve(puzzle)).toBe(46334);
+    expect(Day18.solve(puzzle, 1)).toBe(46334);
+  });
+  it("Solve day 18 part 2 puzzle", () => {
+    expect(Day18.solve(puzzle, 2)).toBe(102000662718092);
   });
 });

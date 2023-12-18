@@ -72,9 +72,6 @@ class Graph {
           return [];
         }
         heat += block.value;
-        if (block.visitedOn[togleOriantation(oriantation)]) {
-          return [];
-        }
         return [
           {
             heat: this.tiles[x][y].heatOn[oriantation] + heat,
@@ -86,51 +83,41 @@ class Graph {
     });
   }
 
-  getMinMin(): { oriantation: Oriantation; block: Block } | undefined {
-    const tiles = this.tiles
-      .flat()
-      .filter(({ visitedOn }) => !visitedOn.horizontal || !visitedOn.vertical);
-    if (tiles.length === 0) {
-      return undefined;
-    }
+  getShortestPaths() {
+    this.tiles[0][0].heatOn = { horizontal: 0, vertical: 0 };
+    const queue = this.tiles.flat().flatMap((tile) => [
+      {
+        oriantation: "vertical" as Oriantation,
+        block: tile,
+      },
+      {
+        oriantation: "horizontal" as Oriantation,
+        block: tile,
+      },
+    ]);
 
-    let min = {
-      oriantation: (tiles[0].visitedOn.horizontal
-        ? "vertical"
-        : "horizontal") as Oriantation,
-      block: tiles[0],
-    };
-    for (const tile of tiles) {
-      if (
-        !tile.visitedOn.horizontal &&
-        tile.heatOn.horizontal < min.block.heatOn[min.oriantation]
-      ) {
-        min = { oriantation: "horizontal" as Oriantation, block: tile };
+    const getMin = ():
+      | { oriantation: Oriantation; block: Block }
+      | undefined => {
+      if (!queue.length) {
+        return undefined;
       }
-      if (
-        !tile.visitedOn.vertical &&
-        tile.heatOn.vertical < min.block.heatOn[min.oriantation]
-      ) {
-        min = { oriantation: "vertical" as Oriantation, block: tile };
-      }
-    }
-    return min;
-  }
+      let minIndex = 0;
+      let heat = queue[0].block.heatOn[queue[0].oriantation];
 
-  markPath(x: number, y: number) {
-    const source = this.tiles.at(x)?.at(y);
-    if (!source) throw "source not found";
-
-    let current: { oriantation: Oriantation; block: Block } | undefined = {
-      oriantation: "horizontal" as Oriantation,
-      block: source,
+      queue.forEach(({ oriantation, block }, index) => {
+        if (
+          (oriantation === "horizontal" && block.heatOn.horizontal < heat) ||
+          (oriantation === "vertical" && block.heatOn.vertical < heat)
+        ) {
+          minIndex = index;
+          heat = block.heatOn[oriantation];
+        }
+      });
+      return queue.splice(minIndex, 1)[0];
     };
 
-    current.block.heatOn = {
-      horizontal: 0,
-      vertical: 0,
-    };
-
+    let current = getMin();
     while (current) {
       this.getNeighbor(
         current.block.x,
@@ -143,13 +130,10 @@ class Graph {
       });
 
       current.block.visitedOn[current.oriantation] = true;
-      current = this.getMinMin();
+      current = getMin();
     }
-
-    return Math.min(
-      this.tiles.at(-1)!.at(-1)!.heatOn.horizontal,
-      this.tiles.at(-1)!.at(-1)!.heatOn.vertical
-    );
+    const { heatOn: target } = this.tiles.at(-1)!.at(-1)!;
+    return Math.min(target.horizontal, target.vertical);
   }
 }
 
@@ -162,6 +146,6 @@ export class Day17 {
         line.split("").map((value, y) => new Block(x, y, +value))
       );
     const graph = new Graph(tiles, ultra);
-    return graph.markPath(0, 0);
+    return graph.getShortestPaths();
   }
 }

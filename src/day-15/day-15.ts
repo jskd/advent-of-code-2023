@@ -1,20 +1,15 @@
 function hash(sequence: string): number {
-  let current = 0;
-  sequence.split("").forEach((letter) => {
-    current += letter.charCodeAt(0);
-    current *= 17;
-    current %= 256;
-  });
-  return current;
+  return sequence
+    .split("")
+    .reduce((hash, letter) => ((hash + letter.charCodeAt(0)) * 17) % 256, 0);
 }
 
 export class Day15 {
   static solve(input: string): number {
     return input
-      .replace(/[\r\n]+/, "")
+      .trim()
       .split(",")
-      .filter(Boolean)
       .map((val) => hash(val))
-      .reduce((acc, v) => acc + v, 0);
+      .reduce((sum, val) => sum + val, 0);
   }
 }

@@ -8,13 +8,12 @@ class Action {
 }
 
 function colorToAction(color: string): Action {
-  const distance = Number(`0x${color.slice(2, 7)}`);
-  const directionHex = color.slice(7, 8);
+  const distance = parseInt(color.slice(2, 7), 16);
   let direction: Direction;
-  if (directionHex === "0") direction = "R";
-  else if (directionHex === "1") direction = "D";
-  else if (directionHex === "2") direction = "L";
-  else if (directionHex === "3") direction = "U";
+  if (color[7] === "0") direction = "R";
+  else if (color[7] === "1") direction = "D";
+  else if (color[7] === "2") direction = "L";
+  else if (color[7] === "3") direction = "U";
   else throw Error("Direction not found");
   return new Action(direction, distance);
 }

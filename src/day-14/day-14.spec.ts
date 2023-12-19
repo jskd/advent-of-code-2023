@@ -1,10 +1,10 @@
-import { Day14Part1, Day14Part2, NodeType, tiltLine } from "./day-14";
+import { Day14Part1, Day14Part2, NodeType, tiltOneLine } from "./day-14";
 import fs from "fs";
 
 describe("Day 14", () => {
   it("tiltLine", () => {
     expect(
-      tiltLine(
+      tiltOneLine(
         ".OO...#.O.".split("").map((v) => v as NodeType),
         false
       )
@@ -13,7 +13,7 @@ describe("Day 14", () => {
 
   it("tiltLine reverse", () => {
     expect(
-      tiltLine(
+      tiltOneLine(
         ".OO...#.O.".split("").map((v) => v as NodeType),
         true
       )

@@ -15,8 +15,8 @@ class Condition {
     }
     const [_, rating, condition, range, then, otherwise] = [...matches];
     this.rating = rating as RatingNames;
-    this.begin = condition === ">" ? +range : -1;
-    this.end = condition === "<" ? +range : Number.MAX_SAFE_INTEGER;
+    this.begin = condition === ">" ? +range : 0;
+    this.end = condition === "<" ? +range : 4001;
     this.then = then;
     this.otherwise = otherwise.includes(":")
       ? new Condition(otherwise)
@@ -54,7 +54,6 @@ function isAccepted(ratings: Rattings, workflowsMap: Map<string, Workflow>) {
 
 export function solveDay19Part1(input: string) {
   const [workflowLines, ratingLines] = input.split(/(?:\r?\n){2}/);
-  const workflows = workflowLines.split(/[\r\n]+/).map((v) => new Workflow(v));
   const ratings = ratingLines
     .split(/[\r\n]+/)
     .filter(Boolean)
@@ -68,7 +67,11 @@ export function solveDay19Part1(input: string) {
     });
 
   const workflowsMap = new Map<string, Workflow>();
-  workflows.forEach((workflow) => workflowsMap.set(workflow.label, workflow));
+  workflowLines.split(/[\r\n]+/).forEach((line) => {
+    const workflow = new Workflow(line);
+    workflowsMap.set(workflow.label, workflow);
+  });
+
   return ratings
     .filter((rating) => isAccepted(rating, workflowsMap))
     .reduce((sum, { x, m, a, s }) => sum + x + m + a + s, 0);

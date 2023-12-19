@@ -1,14 +1,12 @@
-class Lens {
-  constructor(
-    readonly label: string,
-    public focal: number
-  ) {}
+interface Lens {
+  label: string;
+  focal: number;
 }
 
 function hash(sequence: string): number {
-  return sequence
-    .split("")
-    .reduce((hash, letter) => ((hash + letter.charCodeAt(0)) * 17) % 256, 0);
+  return [...sequence]
+    .map((letter) => letter.charCodeAt(0))
+    .reduce((hash, letter) => ((hash + letter) * 17) % 256, 0);
 }
 
 function excute(boxes: Lens[][], sequence: string) {
@@ -19,39 +17,32 @@ function excute(boxes: Lens[][], sequence: string) {
     if (indexLens != -1) {
       box[indexLens].focal = +focal;
     } else {
-      box.push(new Lens(label, +focal));
+      box.push({ label: label, focal: +focal });
     }
   } else if (indexLens != -1) {
     box.splice(indexLens, 1);
   }
 }
 
-export class Day15Part1 {
-  static solve(input: string): number {
-    return input
-      .trim()
-      .split(",")
-      .reduce((sum, line) => sum + hash(line), 0);
-  }
+export function solveDay15Part1(input: string): number {
+  return input
+    .replace(/[\r\n]+/, "")
+    .split(",")
+    .reduce((sum, line) => sum + hash(line), 0);
 }
 
-export class Day15Part2 {
-  static solve(input: string): number {
-    const boxes: Lens[][] = [];
-    input
-      .replace(/[\r\n]+/, "")
-      .trim()
-      .split(",")
-      .forEach((sequence) => excute(boxes, sequence));
-    return boxes.reduce(
-      (sumPower, box, boxIdx) =>
-        sumPower +
-        box.reduce(
-          (power, { focal }, lensIndex) =>
-            power + (boxIdx + 1) * (lensIndex + 1) * focal,
-          0
-        ),
-      0
-    );
-  }
+export function solveDay15Part2(input: string): number {
+  const boxes: Lens[][] = [];
+  input
+    .replace(/[\r\n]+/, "")
+    .split(",")
+    .forEach((sequence) => excute(boxes, sequence));
+  return boxes.reduce(
+    (sum, box, boxId) =>
+      box.reduce(
+        (sum, { focal }, lensId) => sum + (boxId + 1) * (lensId + 1) * focal,
+        sum
+      ),
+    0
+  );
 }

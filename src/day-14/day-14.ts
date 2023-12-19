@@ -9,40 +9,38 @@ class Node {
 }
 
 class Grid {
-  readonly cols: Node[][] = [];
+  constructor(readonly nodes: Node[]) {}
 
-  constructor(readonly nodes: Node[]) {
-    nodes.forEach((node) => {
-      const cols = (this.cols[node.y] ??= []);
-      cols.push(node);
+  tiltNorth() {
+    const columns: Node[][] = [];
+    this.nodes.forEach((node) => {
+      const column = (columns[node.y] ??= []);
+      column.push(node);
     });
 
-    this.cols.forEach((col) => {
-      let placementAvailable = 0;
-      col.forEach((node) => {
+    columns.forEach((column) => {
+      let nextPlacement = 0;
+      column.forEach((node) => {
         if (node.value === "#") {
-          placementAvailable = node.x + 1;
+          nextPlacement = node.x + 1;
         } else if (node.value === "O") {
-          node.x = placementAvailable;
-          placementAvailable++;
+          node.x = nextPlacement;
+          nextPlacement++;
         }
       });
     });
   }
 
   getSumLoad() {
+    this.tiltNorth();
     const maxX = this.nodes.reduce((acc, { x }) => Math.max(acc, x), 0);
 
-    return this.cols.reduce(
-      (sum, col) =>
-        col.reduce((acc, node) => {
-          if (node.value === "O") {
-            return acc + (maxX - node.x + 1);
-          }
-          return acc;
-        }, sum),
-      0
-    );
+    return this.nodes.reduce((acc, node) => {
+      if (node.value === "O") {
+        return acc + (maxX - node.x + 1);
+      }
+      return acc;
+    }, 0);
   }
 }
 

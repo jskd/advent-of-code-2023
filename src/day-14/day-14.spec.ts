@@ -9,23 +9,23 @@ import fs from "fs";
 describe("Day 14", () => {
   const toNode = (v: string) => v.split("").map((v) => v as NodeType);
   test.each([
-    [toNode(".#....#..."), toNode(".#....#...")],
-    [toNode("#.O...O..."), toNode("#OO.......")],
-    [toNode(".O...O...#"), toNode("OO.......#")],
-    [toNode(".OO...#.O."), toNode("OO....#O..")],
-    [toNode("..O.#O#.O."), toNode("O...#O#O..")],
+    [".#....#...", ".#....#..."],
+    ["#.O...O...", "#OO......."],
+    [".O...O...#", "OO.......#"],
+    [".OO...#.O.", "OO....#O.."],
+    ["..O.#O#.O.", "O...#O#O.."],
   ])("Tilt line %j", (input, expected) =>
-    expect(tiltOneLine(input, false)).toEqual(expected)
+    expect(tiltOneLine(toNode(input), false)).toEqual(toNode(expected))
   );
 
   test.each([
-    [toNode(".#....#..."), toNode(".#....#...")],
-    [toNode("#.O...O..."), toNode("#.......OO")],
-    [toNode(".O...O...#"), toNode(".......OO#")],
-    [toNode(".OO...#.O."), toNode("....OO#..O")],
-    [toNode("..O.#O#.O."), toNode("...O#O#..O")],
-  ])("Tilt line reverse %j", (input, expected) =>
-    expect(tiltOneLine(input, true)).toEqual(expected)
+    [".#....#...", ".#....#..."],
+    ["#.O...O...", "#.......OO"],
+    [".O...O...#", ".......OO#"],
+    [".OO...#.O.", "....OO#..O"],
+    ["..O.#O#.O.", "...O#O#..O"],
+  ])("Tilt line reverse %s", (input, expected) =>
+    expect(tiltOneLine(toNode(input), true)).toEqual(toNode(expected))
   );
 
   const example =

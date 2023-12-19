@@ -7,23 +7,26 @@ import {
 import fs from "fs";
 
 describe("Day 14", () => {
-  it("tiltLine", () => {
-    expect(
-      tiltOneLine(
-        ".OO...#.O.".split("").map((v) => v as NodeType),
-        false
-      )
-    ).toEqual("OO....#O..".split("").map((v) => v as NodeType));
-  });
+  const toNode = (v: string) => v.split("").map((v) => v as NodeType);
+  test.each([
+    [toNode(".#....#..."), toNode(".#....#...")],
+    [toNode("#.O...O..."), toNode("#OO.......")],
+    [toNode(".O...O...#"), toNode("OO.......#")],
+    [toNode(".OO...#.O."), toNode("OO....#O..")],
+    [toNode("..O.#O#.O."), toNode("O...#O#O..")],
+  ])("Tilt line %j", (input, expected) =>
+    expect(tiltOneLine(input, false)).toEqual(expected)
+  );
 
-  it("tiltLine reverse", () => {
-    expect(
-      tiltOneLine(
-        ".OO...#.O.".split("").map((v) => v as NodeType),
-        true
-      )
-    ).toEqual("....OO#..O".split("").map((v) => v as NodeType));
-  });
+  test.each([
+    [toNode(".#....#..."), toNode(".#....#...")],
+    [toNode("#.O...O..."), toNode("#.......OO")],
+    [toNode(".O...O...#"), toNode(".......OO#")],
+    [toNode(".OO...#.O."), toNode("....OO#..O")],
+    [toNode("..O.#O#.O."), toNode("...O#O#..O")],
+  ])("Tilt line reverse %j", (input, expected) =>
+    expect(tiltOneLine(input, true)).toEqual(expected)
+  );
 
   const example =
     "O....#....\r\n" +

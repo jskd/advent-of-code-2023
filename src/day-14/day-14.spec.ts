@@ -31,60 +31,52 @@ describe("Day 14", () => {
   );
 
   const toNodeGrid = (line: string[]) => line.map((node) => toNode(node));
-  test.each([
-    [
-      // prettier-ignore
-      ["O....#....", 
-       "O.OO#....#", 
-       ".....##...", 
-       "OO.#O....O"],
-      "north",
-      // prettier-ignore
-      ["OOOO.#....", 
-       "O...#....#", 
-       "O...O##..O", 
-       "...#......"],
-    ],
-    [
-      // prettier-ignore
-      ["O....#....", 
-       "O.OO#....#", 
-       ".....##...", 
-       "OO.#O....O"],
-      "east",
-      // prettier-ignore
-      ["....O#....", 
-       ".OOO#....#", 
-       ".....##...", 
-       ".OO#....OO"],
-    ],
-    [
-      // prettier-ignore
-      ["O....#....", 
-       "O.OO#....#", 
-       ".....##...", 
-       "OO.#O....O"],
-      "south",
-      // prettier-ignore
-      [".....#....", 
-       "O...#....#", 
-       "O..O.##...", 
-       "OOO#O....O"],
-    ],
-    [
-      // prettier-ignore
-      ["O....#....", 
-       "O.OO#....#", 
-       ".....##...", 
-       "OO.#O....O"],
-      "west",
-      // prettier-ignore
-      ["O....#....", 
-       "OOO.#....#", 
-       ".....##...", 
-       "OO.#OO...."],
-    ],
-  ])("Tilt multiple lines %s %s", (input, direction, expected) =>
+  test.each(
+    // prettier-ignore
+    [ 
+      [ 
+        "north",
+        ["O....#....", 
+         "O.OO#....#", 
+         ".....##...", 
+         "OO.#O....O"],
+        ["OOOO.#....", 
+         "O...#....#", 
+         "O...O##..O", 
+         "...#......"],
+      ], [
+        "east",
+        ["O....#....", 
+         "O.OO#....#", 
+         ".....##...", 
+         "OO.#O....O"],
+        ["....O#....", 
+         ".OOO#....#", 
+         ".....##...", 
+         ".OO#....OO"],
+      ], [
+        "south",
+        ["O....#....", 
+         "O.OO#....#", 
+         ".....##...", 
+         "OO.#O....O"],
+        [".....#....", 
+         "O...#....#", 
+         "O..O.##...", 
+         "OOO#O....O"],
+      ], [
+        "west",
+        ["O....#....", 
+         "O.OO#....#", 
+         ".....##...", 
+         "OO.#O....O"],
+        ["O....#....", 
+         "OOO.#....#", 
+         ".....##...", 
+         "OO.#OO...."],
+      ],
+    ]
+  )("Tilt multiple lines %s %j", (direction, input, expected) =>
     expect(tiltMultipleLine(toNodeGrid(input), direction as Direction)).toEqual(
       toNodeGrid(expected)
     )

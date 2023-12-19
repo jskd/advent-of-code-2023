@@ -67,22 +67,18 @@ function getSumLoad(nodes: NodeType[][]) {
   );
 }
 
-export class Day14Part1 {
-  static solve(input: string): number {
-    const nodes = input
-      .split(/[\r\n]+/)
-      .filter(Boolean)
-      .map((line) => line.split("").map((value) => value as NodeType));
-    return getSumLoad(tiltMultipleLine(nodes, "north"));
-  }
+export function solveDay14Part1(input: string): number {
+  const nodes = input
+    .split(/[\r\n]+/)
+    .filter(Boolean)
+    .map((line) => line.split("").map((value) => value as NodeType));
+  return getSumLoad(tiltMultipleLine(nodes, "north"));
 }
 
-export class Day14Part2 {
-  static solve(input: string): number {
-    const nodes = input
-      .split(/[\r\n]+/)
-      .filter(Boolean)
-      .map((line) => line.split("").map((value) => value as NodeType));
-    return getSumLoad(tiltMultipleCycle(nodes, 1000000000));
-  }
+export function solveDay14Part2(input: string): number {
+  const nodes = input
+    .split(/[\r\n]+/)
+    .filter(Boolean)
+    .map((line) => line.split("").map((value) => value as NodeType));
+  return getSumLoad(tiltMultipleCycle(nodes, 1000000000));
 }

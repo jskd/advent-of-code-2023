@@ -1,4 +1,9 @@
-import { Day14Part1, Day14Part2, NodeType, tiltOneLine } from "./day-14";
+import {
+  NodeType,
+  solveDay14Part1,
+  solveDay14Part2,
+  tiltOneLine,
+} from "./day-14";
 import fs from "fs";
 
 describe("Day 14", () => {
@@ -32,17 +37,17 @@ describe("Day 14", () => {
     "#....###..\r\n" +
     "#OO..#....\r\n";
   it("Solve day 14 part 1 exemple", () => {
-    expect(Day14Part1.solve(example)).toBe(136);
+    expect(solveDay14Part1(example)).toBe(136);
   });
   it("Solve day 14 part 2 exemple", () => {
-    expect(Day14Part2.solve(example)).toBe(64);
+    expect(solveDay14Part2(example)).toBe(64);
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-14-input.txt`).toString();
   it("Solve day 14 part 1 puzzle", () => {
-    expect(Day14Part1.solve(puzzle)).toBe(109638);
+    expect(solveDay14Part1(puzzle)).toBe(109638);
   });
   it("Solve day 14 part 2 puzzle", () => {
-    expect(Day14Part2.solve(puzzle)).toBe(102657);
+    expect(solveDay14Part2(puzzle)).toBe(102657);
   });
 });

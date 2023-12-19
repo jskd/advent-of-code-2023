@@ -39,10 +39,9 @@ describe("Day 14", () => {
   });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-14-input.txt`).toString();
-  it("Solve day 14 part 2 puzzle", () => {
+  it("Solve day 14 part 1 puzzle", () => {
     expect(Day14Part1.solve(puzzle)).toBe(109638);
   });
-
   it("Solve day 14 part 2 puzzle", () => {
     expect(Day14Part2.solve(puzzle)).toBe(102657);
   });

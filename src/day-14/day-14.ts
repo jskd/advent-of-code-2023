@@ -53,29 +53,34 @@ function getSumLoad(nodes: NodeType[][]) {
   );
 }
 
-function hash(nodes: NodeType[][]) {
-  return nodes.flat().join("");
+function tiltOneCycle(nodes: NodeType[][]) {
+  nodes = tilt(nodes, "north");
+  nodes = tilt(nodes, "west");
+  nodes = tilt(nodes, "south");
+  return tilt(nodes, "east");
 }
 
-function tiltCycle(nodes: NodeType[][]) {
-  const currentpouet = new Map<string, number>();
-  const maxCycles = 1000000000;
-  for (let i = 0; i < maxCycles; i++) {
-    nodes = tilt(nodes, "north");
-    nodes = tilt(nodes, "west");
-    nodes = tilt(nodes, "south");
-    nodes = tilt(nodes, "east");
+function hash(nodes: NodeType[][]) {
+  return nodes.flat().join("");
+  /*return nodes
+    .flatMap((line) => [
+      ...line.map((v) => (v === "#" ? 3 : v === "O" ? 2 : 1)),
+      0,
+    ])
+    .reduce((acc, v) => (acc << 2) + v, 0);*/
+}
 
-    const loop = currentpouet.get(hash(nodes));
+function tiltMultipleCycle(nodes: NodeType[][], cycle: number) {
+  const gridSeen = new Map<string, number>();
+  for (let i = 0; i < cycle; i++) {
+    nodes = tiltOneCycle(nodes);
+    const loop = gridSeen.get(hash(nodes));
     if (!loop) {
-      currentpouet.set(hash(nodes), i);
+      gridSeen.set(hash(nodes), i);
     } else {
-      const remainingCycle = (maxCycles - 1 - i) % (i - loop);
+      const remainingCycle = (cycle - i - 1) % (i - loop);
       for (let i = 0; i < remainingCycle; i++) {
-        nodes = tilt(nodes, "north");
-        nodes = tilt(nodes, "west");
-        nodes = tilt(nodes, "south");
-        nodes = tilt(nodes, "east");
+        nodes = tiltOneCycle(nodes);
       }
       return nodes;
     }
@@ -99,7 +104,6 @@ export class Day14Part2 {
       .split(/[\r\n]+/)
       .filter(Boolean)
       .map((line) => line.split("").map((value) => value as NodeType));
-
-    return getSumLoad(tiltCycle(nodes));
+    return getSumLoad(tiltMultipleCycle(nodes, 1000000000));
   }
 }

@@ -1,5 +1,5 @@
 export type NodeType = "#" | "O" | ".";
-type Direction = "north" | "east" | "west" | "south";
+export type Direction = "north" | "east" | "west" | "south";
 
 export function tiltOneLine(nodes: NodeType[], reverse: boolean) {
   const result: NodeType[] = Array<NodeType>(nodes.length).fill(".");
@@ -17,7 +17,7 @@ export function tiltOneLine(nodes: NodeType[], reverse: boolean) {
   return result;
 }
 
-function tiltMultipleLine(nodes: NodeType[][], direction: Direction) {
+export function tiltMultipleLine(nodes: NodeType[][], direction: Direction) {
   const turnCounterClockwise = (nodes: NodeType[][]) =>
     nodes[0].map((_, index) => nodes.map((row) => row[index]).reverse());
   const turnClockwise = (nodes: NodeType[][]) =>

@@ -3,6 +3,8 @@ import {
   solveDay14Part1,
   solveDay14Part2,
   tiltOneLine,
+  Direction,
+  tiltMultipleLine,
 } from "./day-14";
 import fs from "fs";
 
@@ -14,7 +16,7 @@ describe("Day 14", () => {
     [".O...O...#", "OO.......#"],
     [".OO...#.O.", "OO....#O.."],
     ["..O.#O#.O.", "O...#O#O.."],
-  ])("Tilt line %j", (input, expected) =>
+  ])("Tilt line %s", (input, expected) =>
     expect(tiltOneLine(toNode(input), false)).toEqual(toNode(expected))
   );
 
@@ -26,6 +28,66 @@ describe("Day 14", () => {
     ["..O.#O#.O.", "...O#O#..O"],
   ])("Tilt line reverse %s", (input, expected) =>
     expect(tiltOneLine(toNode(input), true)).toEqual(toNode(expected))
+  );
+
+  const toNodeGrid = (line: string[]) => line.map((node) => toNode(node));
+  test.each([
+    [
+      // prettier-ignore
+      ["O....#....", 
+       "O.OO#....#", 
+       ".....##...", 
+       "OO.#O....O"],
+      "north",
+      // prettier-ignore
+      ["OOOO.#....", 
+       "O...#....#", 
+       "O...O##..O", 
+       "...#......"],
+    ],
+    [
+      // prettier-ignore
+      ["O....#....", 
+       "O.OO#....#", 
+       ".....##...", 
+       "OO.#O....O"],
+      "east",
+      // prettier-ignore
+      ["....O#....", 
+       ".OOO#....#", 
+       ".....##...", 
+       ".OO#....OO"],
+    ],
+    [
+      // prettier-ignore
+      ["O....#....", 
+       "O.OO#....#", 
+       ".....##...", 
+       "OO.#O....O"],
+      "south",
+      // prettier-ignore
+      [".....#....", 
+       "O...#....#", 
+       "O..O.##...", 
+       "OOO#O....O"],
+    ],
+    [
+      // prettier-ignore
+      ["O....#....", 
+       "O.OO#....#", 
+       ".....##...", 
+       "OO.#O....O"],
+      "west",
+      // prettier-ignore
+      ["O....#....", 
+       "OOO.#....#", 
+       ".....##...", 
+       "OO.#OO...."],
+    ],
+  ])("Tilt multiple lines %s %s", (input, direction, expected) =>
+    expect(tiltMultipleLine(toNodeGrid(input), direction as Direction)).toEqual(
+      toNodeGrid(expected)
+    )
   );
 
   const example =

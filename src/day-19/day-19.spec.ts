@@ -1,4 +1,4 @@
-import { solveDay19Part1 } from "./day-19";
+import { solveDay19Part1, solveDay19Part2 } from "./day-19";
 import fs from "fs";
 
 describe("Day 19", () => {
@@ -23,9 +23,15 @@ describe("Day 19", () => {
   it("Solve day 19 part 1 exemple", () => {
     expect(solveDay19Part1(example)).toBe(19114);
   });
+  it("Solve day 19 part 2 exemple", () => {
+    expect(solveDay19Part2(example)).toBe(167409079868000);
+  });
 
   const puzzle = fs.readFileSync(`${__dirname}/day-19-input.txt`).toString();
   it("Solve day 19 part 1 puzzle", () => {
     expect(solveDay19Part1(puzzle)).toBe(287054);
+  });
+  it("Solve day 19 part 1 puzzle", () => {
+    expect(solveDay19Part2(puzzle)).toBe(131619440296497);
   });
 });

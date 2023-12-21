@@ -1,5 +1,8 @@
-type RatingNames = "x" | "m" | "a" | "s";
+const ratingNames = ["x", "m", "a", "s"] as const;
+type RatingNames = (typeof ratingNames)[number];
+
 type Rattings = Record<RatingNames, number>;
+type RattingsRange = Record<RatingNames, { begin: number; end: number }>;
 
 class Condition {
   rating: RatingNames;
@@ -9,9 +12,9 @@ class Condition {
   otherwise: Condition | string;
 
   constructor(line: string) {
-    const matches = line.match(/^([xmas])([<>])(\d+):(\w+),(.*)/);
+    const matches = line.match(/^([xmas])([<>])(\d+):(\w+),(.+)$/);
     if (!matches) {
-      throw "Parsing error";
+      throw "Pattern not found";
     }
     const [_, rating, condition, range, then, otherwise] = [...matches];
     this.rating = rating as RatingNames;
@@ -27,7 +30,7 @@ class Condition {
 class Workflow extends Condition {
   label: string;
   constructor(line: string) {
-    const [label, condition] = line.replace("}", "").split("{");
+    const [label, condition] = line.slice(0, -1).split("{");
     super(condition);
     this.label = label;
   }
@@ -52,22 +55,65 @@ function isAccepted(ratings: Rattings, workflowsMap: Map<string, Workflow>) {
   return current === "A";
 }
 
+function countPosibilitied(
+  label: string,
+  range: RattingsRange,
+  workflowsMap: Map<string, Workflow>
+): number {
+  if (label === "R") {
+    return 0;
+  }
+
+  if (label === "A") {
+    return ratingNames.reduce(
+      (acc, key) => acc * (range[key].end - range[key].end),
+      1
+    );
+  }
+
+  const flow = workflowsMap.get(label);
+  if (!flow) {
+    throw "Workflow label not found";
+  }
+
+  let posibilities = 0;
+  if (
+    flow.end > range[flow.rating].begin &&
+    flow.begin < range[flow.rating].end
+  ) {
+    // then
+    // Math.max( range[flow.rating].start, flow.start)
+    // to
+    // Math.min( range[flow.rating].end, flow.end),
+  }
+  if (range[flow.rating].begin < flow.begin) {
+    // otherwise
+    // range[flow.rating].begin to flow.begin
+  }
+  if (flow.end < range[flow.rating].end) {
+    //  otherwise
+    // flow.end to range[flow.rating].end
+  }
+
+  return posibilities;
+}
+
 export function solveDay19Part1(input: string) {
-  const [workflowLines, ratingLines] = input.split(/(?:\r?\n){2}/);
-  const ratings = ratingLines
-    .split(/[\r\n]+/)
-    .filter(Boolean)
-    .map((line) => {
-      const matchs = line.match(/^{x=(\d+),m=(\d+),a=(\d+),s=(\d+)}/);
-      if (!matchs) {
-        throw "Parsing error";
-      }
-      const [_, x, m, a, s] = [...matchs];
-      return { x: +x, m: +m, a: +a, s: +s } as Rattings;
-    });
+  const [workflowLines, ratingLines] = input
+    .split(/(?:\r?\n){2}/)
+    .map((lines) => lines.split(/[\r\n]+/).filter(Boolean));
+
+  const ratings: Rattings[] = ratingLines.map((line) => {
+    const matchs = line.match(/^{x=(\d+),m=(\d+),a=(\d+),s=(\d+)}/);
+    if (!matchs) {
+      throw "Pattern not found";
+    }
+    const [_, x, m, a, s] = [...matchs];
+    return { x: +x, m: +m, a: +a, s: +s };
+  });
 
   const workflowsMap = new Map<string, Workflow>();
-  workflowLines.split(/[\r\n]+/).forEach((line) => {
+  workflowLines.forEach((line) => {
     const workflow = new Workflow(line);
     workflowsMap.set(workflow.label, workflow);
   });

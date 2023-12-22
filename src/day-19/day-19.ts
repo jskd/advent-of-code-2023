@@ -2,26 +2,25 @@ const ratingNames = ["x", "m", "a", "s"] as const;
 type RatingNames = (typeof ratingNames)[number];
 type ConditionOperator = ">" | "<";
 
-type Rattings = Record<RatingNames, number>;
-type RattingsRange = Record<RatingNames, { begin: number; end: number }>;
+type Ratings = Record<RatingNames, number>;
+type RatingsRange = Record<RatingNames, { begin: number; end: number }>;
 
 class Condition {
   rating: RatingNames;
+  operator: ConditionOperator;
+  operand: number;
   then: string;
   otherwise: Condition | string;
-  operator: ConditionOperator;
-  value: number;
 
   constructor(line: string) {
     const matches = line.match(/^([xmas])([<>])(\d+):(\w+),(.+)$/);
     if (!matches) {
       throw "Pattern not found";
     }
-    const [_, rating, condition, range, then, otherwise] = [...matches];
+    const [_, rating, operator, operand, then, otherwise] = [...matches];
     this.rating = rating as RatingNames;
-    this.operator = condition as ConditionOperator;
-    this.value = +range;
-
+    this.operator = operator as ConditionOperator;
+    this.operand = +operand;
     this.then = then;
     this.otherwise = otherwise.includes(":")
       ? new Condition(otherwise)
@@ -38,17 +37,18 @@ class Workflow extends Condition {
   }
 }
 
-function execute(line: Rattings, condition: Condition): string {
-  const { operator, value, then, otherwise } = condition;
-  const check = line[condition.rating];
+function execute(ratings: Ratings, condition: Condition): string {
+  const { operator, operand, then, otherwise } = condition;
+  const rating = ratings[condition.rating];
   const result =
-    (operator === ">" && check > value) || (operator === "<" && check < value)
+    (operator === ">" && rating > operand) ||
+    (operator === "<" && rating < operand)
       ? then
       : otherwise;
-  return result instanceof Condition ? execute(line, result) : result;
+  return result instanceof Condition ? execute(ratings, result) : result;
 }
 
-function isAccepted(ratings: Rattings, workflowsMap: Map<string, Workflow>) {
+function isAccepted(ratings: Ratings, workflowsMap: Map<string, Workflow>) {
   let current: Condition | string = "in";
   while (current != "R" && current != "A") {
     const flow = workflowsMap.get(current);
@@ -62,14 +62,12 @@ function isAccepted(ratings: Rattings, workflowsMap: Map<string, Workflow>) {
 
 function getCombinations(
   workflow: Condition | string,
-  range: RattingsRange,
+  range: RatingsRange,
   workflowsMap: Map<string, Workflow>
 ): number {
   if (workflow === "R") {
     return 0;
-  }
-
-  if (workflow === "A") {
+  } else if (workflow === "A") {
     return ratingNames.reduce(
       (sum, key) => sum * (range[key].end - range[key].begin + 1),
       1
@@ -78,22 +76,23 @@ function getCombinations(
 
   if (!(workflow instanceof Condition)) {
     if (!workflowsMap.has(workflow)) {
-      throw "Workflow not found";
+      throw "Workflow label not found";
     }
     workflow = workflowsMap.get(workflow)!;
   }
 
-  const { value, operator, otherwise, then, rating } = workflow;
+  const { operand, operator, otherwise, then, rating } = workflow;
 
   const beforeConditon = operator === "<" ? then : otherwise;
-  const before = structuredClone(range);
-  before[rating].end = value + (operator === "<" ? -1 : 0);
+  const beforeRange = structuredClone(range);
+  beforeRange[rating].end = operand + (operator === "<" ? -1 : 0);
 
   const afterConditon = operator === ">" ? then : otherwise;
   const afterRange = structuredClone(range);
-  afterRange[rating].begin = value + (operator === ">" ? 1 : 0);
+  afterRange[rating].begin = operand + (operator === ">" ? 1 : 0);
+
   return (
-    getCombinations(beforeConditon, before, workflowsMap) +
+    getCombinations(beforeConditon, beforeRange, workflowsMap) +
     getCombinations(afterConditon, afterRange, workflowsMap)
   );
 }
@@ -102,6 +101,7 @@ export function solveDay19(input: string, part: 1 | 2) {
   const [workflowLines, ratingLines] = input
     .split(/(?:\r?\n){2}/)
     .map((lines) => lines.split(/[\r\n]+/).filter(Boolean));
+
   const workflowsMap = new Map<string, Workflow>();
   workflowLines.forEach((line) => {
     const workflow = new Workflow(line);
@@ -122,7 +122,7 @@ export function solveDay19(input: string, part: 1 | 2) {
       .reduce((sum, { x, m, a, s }) => sum + x + m + a + s, 0);
   }
 
-  const range: RattingsRange = {
+  const range: RatingsRange = {
     x: { begin: 1, end: 4000 },
     m: { begin: 1, end: 4000 },
     a: { begin: 1, end: 4000 },

@@ -1,13 +1,12 @@
 const ratingNames = ["x", "m", "a", "s"] as const;
 type RatingNames = (typeof ratingNames)[number];
-type ConditionOperator = ">" | "<";
-
+type Range = Record<RatingNames, { begin: number; end: number }>;
 type Ratings = Record<RatingNames, number>;
-type RatingsRange = Record<RatingNames, { begin: number; end: number }>;
+type Operator = ">" | "<";
 
 class Condition {
   rating: RatingNames;
-  operator: ConditionOperator;
+  operator: Operator;
   operand: number;
   then: string;
   otherwise: Condition | string;
@@ -19,7 +18,7 @@ class Condition {
     }
     const [_, rating, operator, operand, then, otherwise] = [...matches];
     this.rating = rating as RatingNames;
-    this.operator = operator as ConditionOperator;
+    this.operator = operator as Operator;
     this.operand = +operand;
     this.then = then;
     this.otherwise = otherwise.includes(":")
@@ -62,7 +61,7 @@ function isAccepted(ratings: Ratings, workflowsMap: Map<string, Workflow>) {
 
 function getCombinations(
   workflow: Condition | string,
-  range: RatingsRange,
+  range: Range,
   workflowsMap: Map<string, Workflow>
 ): number {
   if (workflow === "R") {
@@ -122,7 +121,7 @@ export function solveDay19(input: string, part: 1 | 2) {
       .reduce((sum, { x, m, a, s }) => sum + x + m + a + s, 0);
   }
 
-  const range: RatingsRange = {
+  const range: Range = {
     x: { begin: 1, end: 4000 },
     m: { begin: 1, end: 4000 },
     a: { begin: 1, end: 4000 },

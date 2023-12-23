@@ -12,11 +12,14 @@ class Point3D implements Record<CordoneNames, number> {
 class Rectangle {
   bellow: Rectangle[] = [];
   abrove: Rectangle[] = [];
+  direction: CordoneNames;
 
   constructor(
     readonly start: Point3D,
     readonly end: Point3D
-  ) {}
+  ) {
+    this.direction = coordinateNames.find((v) => start[v] != end[v]) ?? "z";
+  }
 
   static compareByLowerZ(a: Rectangle, b: Rectangle): number {
     const aZ = Math.min(a.start.z, a.end.z);
@@ -40,6 +43,24 @@ class Rectangle {
     }
     return falling;
   }
+
+  foreachPoint2D(callbackFn: (x: number, y: number) => void) {
+    const { start, end, direction } = this;
+    if (direction === "z") {
+      callbackFn(this.start.x, this.start.y);
+      return;
+    }
+
+    let i = Math.min(start[direction], end[direction]);
+    while (i <= Math.max(start[direction], end[direction])) {
+      if (direction === "x") {
+        callbackFn(i, this.start.y);
+      } else {
+        callbackFn(this.start.x, i);
+      }
+      i++;
+    }
+  }
 }
 
 export function solveDay22(input: string, part: 1 | 2) {
@@ -57,54 +78,30 @@ export function solveDay22(input: string, part: 1 | 2) {
 
   const heigth = Math.max(...sharps.flatMap((v) => [v.start.x, v.end.x])) + 1;
   const width = Math.max(...sharps.flatMap((v) => [v.start.y, v.end.y])) + 1;
-  const hightestZ = Array.from({ length: heigth }, () =>
-    Array.from({ length: width })
+  const hightestZ: (Rectangle | undefined)[][] = Array.from(
+    { length: heigth },
+    () => Array.from({ length: width })
   );
 
   sharps.forEach((sharp) => {
-    const direction =
-      coordinateNames.find((v) => sharp.start[v] != sharp.end[v]) ?? "z";
-
-    let bellow = [];
-
-    if (direction === "z") {
-      bellow.push(hightestZ[sharp.start.x][sharp.start.y]);
-    } else {
-      const start = Math.min(sharp.start[direction], sharp.end[direction]);
-      const end = Math.max(sharp.end[direction], sharp.end[direction]);
-      for (let i = start; i <= end; i++) {
-        bellow.push(
-          direction === "x"
-            ? hightestZ[i][sharp.start.y]
-            : hightestZ[sharp.start.x][i]
-        );
-      }
-    }
-    bellow = bellow.filter((item): item is Rectangle => !!item);
+    const bellow: Rectangle[] = [];
+    sharp.foreachPoint2D((x, y) => {
+      const bal = hightestZ[x][y];
+      if (bal === undefined) return;
+      if (bellow.includes(bal)) return;
+      bellow.push(bal);
+    });
 
     const higestZ = bellow.reduce((z, v) => Math.max(z, v.start.z, v.end.z), 0);
-    sharp.bellow = bellow
-      .filter((v) => higestZ === Math.max(v.start.z, v.end.z))
-      .filter((value, index, array) => array.indexOf(value) === index);
+    sharp.bellow = bellow.filter(
+      (v) => higestZ === Math.max(v.start.z, v.end.z)
+    );
     sharp.bellow.forEach((v) => v.abrove.push(sharp));
 
-    if (direction === "z") {
-      const heigt = Math.abs(sharp.start.z - sharp.end.z);
-      sharp.start.z = higestZ + 1;
-      sharp.end.z = sharp.start.z + heigt;
-      hightestZ[sharp.start.x][sharp.start.y] = sharp;
-    } else {
-      sharp.start.z = sharp.end.z = higestZ + 1;
-      const start = Math.min(sharp.start[direction], sharp.end[direction]);
-      const end = Math.max(sharp.start[direction], sharp.end[direction]);
-      for (let i = start; i <= end; i++) {
-        if (direction === "x") {
-          hightestZ[i][sharp.start.y] = sharp;
-        } else if (direction === "y") {
-          hightestZ[sharp.start.x][i] = sharp;
-        }
-      }
-    }
+    const height = Math.abs(sharp.start.z - sharp.end.z);
+    sharp.start.z = higestZ + 1;
+    sharp.end.z = sharp.start.z + height;
+    sharp.foreachPoint2D((x, y) => (hightestZ[x][y] = sharp));
   });
 
   return part === 1

@@ -24,7 +24,7 @@ class Point3D implements Record<CordoneNames, number> {
   ) {}
 }
 
-export function solveDay22(input: string) {
+export function solveDay22(input: string, part: 1 | 2) {
   const sharps = input
     .split(/[\r\n]+/)
     .filter(Boolean)
@@ -94,7 +94,35 @@ export function solveDay22(input: string) {
 
   const notRemovableSefely = sharps
     .flatMap(({ bellow }) => (bellow.length === 1 ? bellow[0] : []))
-    .filter((value, index, array) => array.indexOf(value) === index).length;
+    .filter((value, index, array) => array.indexOf(value) === index);
 
-  return sharps.length - notRemovableSefely;
+  if (part === 1) {
+    return sharps.length - notRemovableSefely.length;
+  }
+
+  return notRemovableSefely.reduce((acc, v) => {
+    const remove = new Set<Rectangle>([v]);
+    let queue: Rectangle[] = [...v.abrove];
+    let current = queue.shift();
+    let numberFall = acc;
+
+    while (current) {
+      const isFalling = !current.bellow.some((v) => !remove.has(v));
+      if (isFalling) {
+        if (!remove.has(current)) {
+          remove.add(current);
+        }
+        queue.push(...current.abrove);
+
+        queue = queue.filter(
+          (value, index, array) => array.indexOf(value) === index
+        );
+
+        numberFall++;
+      }
+      current = queue.shift();
+    }
+
+    return numberFall;
+  }, 0);
 }

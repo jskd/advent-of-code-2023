@@ -27,6 +27,23 @@ class Brick {
     return aZ > bZ ? 1 : aZ < bZ ? -1 : 0;
   }
 
+  foreachPoint2D(callbackFn: (x: number, y: number) => void) {
+    const { start, end, direction } = this;
+    if (direction === "z") {
+      callbackFn(start.x, start.y);
+    } else {
+      let i = Math.min(start[direction], end[direction]);
+      while (i <= Math.max(start[direction], end[direction])) {
+        direction === "x" ? callbackFn(i, start.y) : callbackFn(start.x, i);
+        i++;
+      }
+    }
+  }
+
+  canBeRemoveSafely(): boolean {
+    return !this.abrove.some((v) => v.below.length === 1);
+  }
+
   getNumberFalling(): number {
     const remove = new Set<Brick>([this]);
     const queue: Brick[] = [...this.abrove];
@@ -42,19 +59,6 @@ class Brick {
       current = queue.shift();
     }
     return falling;
-  }
-
-  foreachPoint2D(callbackFn: (x: number, y: number) => void) {
-    const { start, end, direction } = this;
-    if (direction === "z") {
-      callbackFn(start.x, start.y);
-    } else {
-      let i = Math.min(start[direction], end[direction]);
-      while (i <= Math.max(start[direction], end[direction])) {
-        direction === "x" ? callbackFn(i, start.y) : callbackFn(start.x, i);
-        i++;
-      }
-    }
   }
 }
 
@@ -97,6 +101,6 @@ export function solveDay22(input: string, part: 1 | 2) {
   });
 
   return part === 1
-    ? bricks.filter((v) => v.getNumberFalling() === 0).length
+    ? bricks.filter((v) => v.canBeRemoveSafely()).length
     : bricks.reduce((sum, v) => sum + v.getNumberFalling(), 0);
 }

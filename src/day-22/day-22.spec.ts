@@ -21,7 +21,7 @@ describe("Day 22", () => {
   it("Solve day 22 part 1 puzzle", () => {
     expect(solveDay22(puzzle, 1)).toBe(424);
   });
-  it("Solve day 22 part 1 puzzle", () => {
+  it("Solve day 22 part 2 puzzle", () => {
     expect(solveDay22(puzzle, 2)).toBe(55483);
   });
 });

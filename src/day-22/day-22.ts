@@ -47,9 +47,9 @@ class Brick {
   foreachPoint2D(callbackFn: (x: number, y: number) => void) {
     const { start, end, direction } = this;
     if (direction === "z") {
-      callbackFn(this.start.x, this.start.y);
+      callbackFn(start.x, start.y);
     } else {
-      let i = Math.min(start[direction], end[this.direction]);
+      let i = Math.min(start[direction], end[direction]);
       while (i <= Math.max(start[direction], end[direction])) {
         direction === "x" ? callbackFn(i, start.y) : callbackFn(start.x, i);
         i++;
@@ -77,10 +77,10 @@ export function solveDay22(input: string, part: 1 | 2) {
     // Find bricks supporting
     let below: Brick[] = [];
     brick.foreachPoint2D((x, y) => {
-      const shape = hightestZ[x][y];
-      if (shape === undefined) return;
-      if (below.includes(shape)) return;
-      below.push(shape);
+      const brick = hightestZ[x][y];
+      if (brick && !below.includes(brick)) {
+        below.push(brick);
+      }
     });
     const higherZ = Math.max(0, ...below.flatMap((v) => [v.start.z, v.end.z]));
     below = below.filter((v) => higherZ === Math.max(v.start.z, v.end.z));

@@ -1,6 +1,6 @@
 class Rectangle {
-  supportedBy: Rectangle[] = [];
-  support: Rectangle[] = [];
+  bellow: Rectangle[] = [];
+  abrove: Rectangle[] = [];
 
   constructor(
     readonly start: Point3D,
@@ -13,8 +13,8 @@ class Rectangle {
     return aZ > bZ ? 1 : aZ < bZ ? -1 : 0;
   }
 }
-const xordoneNames = ["x", "y", "z"] as const;
-type CordoneNames = (typeof xordoneNames)[number];
+const coordinateNames = ["x", "y", "z"] as const;
+type CordoneNames = (typeof coordinateNames)[number];
 
 class Point3D implements Record<CordoneNames, number> {
   constructor(
@@ -37,69 +37,49 @@ export function solveDay22(input: string) {
     })
     .sort(Rectangle.compareByLowerZ);
 
-  const heigth = sharps.reduce((x, v) => Math.max(v.end.x, v.start.x, x), 0);
-  const width = sharps.reduce((y, v) => Math.max(v.end.y, v.start.y, y), 0);
-
-  console.log(heigth, width);
-
-  const hightestZ = Array.from({ length: heigth + 1 }, () =>
-    Array.from({ length: width + 1 })
+  const heigth = Math.max(...sharps.flatMap((v) => [v.start.x, v.end.x])) + 1;
+  const width = Math.max(...sharps.flatMap((v) => [v.start.y, v.end.y])) + 1;
+  const hightestZ = Array.from({ length: heigth }, () =>
+    Array.from({ length: width })
   );
 
   sharps.forEach((sharp) => {
-    console.log(
-      hightestZ.map((l) =>
-        l.map((v) =>
-          v instanceof Rectangle ? Math.max(v.start.z, v.end.z) : undefined
-        )
-      )
-    );
+    const direction =
+      coordinateNames.find((v) => sharp.start[v] != sharp.end[v]) ?? "z";
 
-    const oriantation =
-      xordoneNames.find((v) => sharp.start[v] != sharp.end[v]) ?? "z";
+    let bellow = [];
 
-    let SharpBelow = [];
-
-    if (oriantation === "z") {
-      SharpBelow.push(hightestZ[sharp.start.x][sharp.start.y]);
+    if (direction === "z") {
+      bellow.push(hightestZ[sharp.start.x][sharp.start.y]);
     } else {
-      const start = Math.min(sharp.start[oriantation], sharp.end[oriantation]);
-      const end = Math.max(sharp.end[oriantation], sharp.end[oriantation]);
+      const start = Math.min(sharp.start[direction], sharp.end[direction]);
+      const end = Math.max(sharp.end[direction], sharp.end[direction]);
       for (let i = start; i <= end; i++) {
-        if (oriantation === "x") {
-          SharpBelow.push(hightestZ[i][sharp.start.y]);
+        if (direction === "x") {
+          bellow.push(hightestZ[i][sharp.start.y]);
         } else {
-          SharpBelow.push(hightestZ[sharp.start.x][i]);
+          bellow.push(hightestZ[sharp.start.x][i]);
         }
       }
     }
 
-    SharpBelow = SharpBelow.filter((item): item is Rectangle => !!item);
+    bellow = bellow.filter((item): item is Rectangle => !!item);
+    const higestZ = bellow.reduce((z, v) => Math.max(z, v.start.z, v.end.z), 0);
+    sharp.bellow = bellow
+      .filter((v) => higestZ === Math.max(v.start.z, v.end.z))
+      .filter((value, index, array) => array.indexOf(value) === index);
+    sharp.bellow.forEach((v) => v.abrove.push(sharp));
 
-    const higestZ = SharpBelow.reduce(
-      (higestZ, { start, end }) => Math.max(higestZ, start.z, end.z),
-      0
-    );
-
-    sharp.supportedBy = [
-      ...new Set(
-        SharpBelow.filter(
-          ({ start, end }) => higestZ === Math.max(start.z, end.z)
-        )
-      ),
-    ];
-    sharp.supportedBy.forEach((v) => v.support.push(sharp));
-
-    if (oriantation === "x" || oriantation === "y") {
+    if (direction === "x" || direction === "y") {
       sharp.end.z = higestZ + 1;
       sharp.start.z = higestZ + 1;
 
-      const start = Math.min(sharp.start[oriantation], sharp.end[oriantation]);
-      const end = Math.max(sharp.start[oriantation], sharp.end[oriantation]);
+      const start = Math.min(sharp.start[direction], sharp.end[direction]);
+      const end = Math.max(sharp.start[direction], sharp.end[direction]);
       for (let i = start; i <= end; i++) {
-        if (oriantation === "x") {
+        if (direction === "x") {
           hightestZ[i][sharp.start.y] = sharp;
-        } else if (oriantation === "y") {
+        } else if (direction === "y") {
           hightestZ[sharp.start.x][i] = sharp;
         }
       }
@@ -112,20 +92,9 @@ export function solveDay22(input: string) {
     }
   });
 
-  console.log(
-    hightestZ.map((l) =>
-      l.map((v) => (v instanceof Rectangle ? Math.max(v.start.z, v.end.z) : 0))
-    )
-  );
-  const notRemovable =
-    sharps.length -
-    [
-      ...new Set(
-        sharps
-          .filter(({ supportedBy }) => supportedBy.length === 1)
-          .flatMap(({ supportedBy }) => supportedBy)
-      ),
-    ].length;
+  const notRemovableSefely = sharps
+    .flatMap(({ bellow }) => (bellow.length === 1 ? bellow[0] : []))
+    .filter((value, index, array) => array.indexOf(value) === index).length;
 
-  return notRemovable;
+  return sharps.length - notRemovableSefely;
 }

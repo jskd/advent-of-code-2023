@@ -1,3 +1,14 @@
+const coordinateNames = ["x", "y", "z"] as const;
+type CordoneNames = (typeof coordinateNames)[number];
+
+class Point3D implements Record<CordoneNames, number> {
+  constructor(
+    readonly x: number,
+    readonly y: number,
+    public z: number
+  ) {}
+}
+
 class Rectangle {
   bellow: Rectangle[] = [];
   abrove: Rectangle[] = [];
@@ -12,16 +23,23 @@ class Rectangle {
     const bZ = Math.min(b.start.z, b.end.z);
     return aZ > bZ ? 1 : aZ < bZ ? -1 : 0;
   }
-}
-const coordinateNames = ["x", "y", "z"] as const;
-type CordoneNames = (typeof coordinateNames)[number];
 
-class Point3D implements Record<CordoneNames, number> {
-  constructor(
-    readonly x: number,
-    readonly y: number,
-    public z: number
-  ) {}
+  getNumberFalling(): number {
+    const remove = new Set<Rectangle>([this]);
+    const queue: Rectangle[] = [...this.abrove];
+    let current = queue.shift();
+    let falling = 0;
+    while (current) {
+      const isFalling = !current.bellow.some((v) => !remove.has(v));
+      if (isFalling) {
+        remove.add(current);
+        queue.push(...current.abrove.filter((v) => !queue.includes(v)));
+        falling++;
+      }
+      current = queue.shift();
+    }
+    return falling;
+  }
 }
 
 export function solveDay22(input: string, part: 1 | 2) {
@@ -55,25 +73,28 @@ export function solveDay22(input: string, part: 1 | 2) {
       const start = Math.min(sharp.start[direction], sharp.end[direction]);
       const end = Math.max(sharp.end[direction], sharp.end[direction]);
       for (let i = start; i <= end; i++) {
-        if (direction === "x") {
-          bellow.push(hightestZ[i][sharp.start.y]);
-        } else {
-          bellow.push(hightestZ[sharp.start.x][i]);
-        }
+        bellow.push(
+          direction === "x"
+            ? hightestZ[i][sharp.start.y]
+            : hightestZ[sharp.start.x][i]
+        );
       }
     }
-
     bellow = bellow.filter((item): item is Rectangle => !!item);
+
     const higestZ = bellow.reduce((z, v) => Math.max(z, v.start.z, v.end.z), 0);
     sharp.bellow = bellow
       .filter((v) => higestZ === Math.max(v.start.z, v.end.z))
       .filter((value, index, array) => array.indexOf(value) === index);
     sharp.bellow.forEach((v) => v.abrove.push(sharp));
 
-    if (direction === "x" || direction === "y") {
-      sharp.end.z = higestZ + 1;
+    if (direction === "z") {
+      const heigt = Math.abs(sharp.start.z - sharp.end.z);
       sharp.start.z = higestZ + 1;
-
+      sharp.end.z = sharp.start.z + heigt;
+      hightestZ[sharp.start.x][sharp.start.y] = sharp;
+    } else {
+      sharp.start.z = sharp.end.z = higestZ + 1;
       const start = Math.min(sharp.start[direction], sharp.end[direction]);
       const end = Math.max(sharp.start[direction], sharp.end[direction]);
       for (let i = start; i <= end; i++) {
@@ -83,36 +104,10 @@ export function solveDay22(input: string, part: 1 | 2) {
           hightestZ[sharp.start.x][i] = sharp;
         }
       }
-    } else {
-      const heigt = Math.abs(sharp.start.z - sharp.end.z);
-      sharp.start.z = higestZ + 1;
-      sharp.end.z = sharp.start.z + heigt;
-
-      hightestZ[sharp.start.x][sharp.start.y] = sharp;
     }
   });
 
-  const notRemovableSafely = sharps
-    .flatMap(({ bellow }) => (bellow.length === 1 ? bellow[0] : []))
-    .filter((value, index, array) => array.indexOf(value) === index);
-
-  if (part === 1) {
-    return sharps.length - notRemovableSafely.length;
-  } else {
-    return notRemovableSafely.reduce((sum, v) => {
-      const remove = new Set<Rectangle>([v]);
-      const queue: Rectangle[] = [...v.abrove];
-      let current = queue.shift();
-      while (current) {
-        const isFalling = !current.bellow.some((v) => !remove.has(v));
-        if (isFalling) {
-          remove.add(current);
-          queue.push(...current.abrove.filter((v) => !queue.includes(v)));
-          sum++;
-        }
-        current = queue.shift();
-      }
-      return sum;
-    }, 0);
-  }
+  return part === 1
+    ? sharps.filter((v) => v.getNumberFalling() === 0).length
+    : sharps.reduce((sum, v) => sum + v.getNumberFalling(), 0);
 }

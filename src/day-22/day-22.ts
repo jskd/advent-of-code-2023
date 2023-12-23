@@ -92,37 +92,27 @@ export function solveDay22(input: string, part: 1 | 2) {
     }
   });
 
-  const notRemovableSefely = sharps
+  const notRemovableSafely = sharps
     .flatMap(({ bellow }) => (bellow.length === 1 ? bellow[0] : []))
     .filter((value, index, array) => array.indexOf(value) === index);
 
   if (part === 1) {
-    return sharps.length - notRemovableSefely.length;
-  }
-
-  return notRemovableSefely.reduce((acc, v) => {
-    const remove = new Set<Rectangle>([v]);
-    let queue: Rectangle[] = [...v.abrove];
-    let current = queue.shift();
-    let numberFall = acc;
-
-    while (current) {
-      const isFalling = !current.bellow.some((v) => !remove.has(v));
-      if (isFalling) {
-        if (!remove.has(current)) {
+    return sharps.length - notRemovableSafely.length;
+  } else {
+    return notRemovableSafely.reduce((sum, v) => {
+      const remove = new Set<Rectangle>([v]);
+      const queue: Rectangle[] = [...v.abrove];
+      let current = queue.shift();
+      while (current) {
+        const isFalling = !current.bellow.some((v) => !remove.has(v));
+        if (isFalling) {
           remove.add(current);
+          queue.push(...current.abrove.filter((v) => !queue.includes(v)));
+          sum++;
         }
-        queue.push(...current.abrove);
-
-        queue = queue.filter(
-          (value, index, array) => array.indexOf(value) === index
-        );
-
-        numberFall++;
+        current = queue.shift();
       }
-      current = queue.shift();
-    }
-
-    return numberFall;
-  }, 0);
+      return sum;
+    }, 0);
+  }
 }
